@@ -1,6 +1,6 @@
 var appLayout = angular.module('appLayout',['ngRoute', 'ui.bootstrap']);
 
-appLayout.controller('layoutController', ['$scope', '$rootScope', 'stormData', function($scope, $rootScope, stormData){
+appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', function($scope, $rootScope, treeData){
 	$scope.tabs = [
 		{ title:'Main'},
 		{ title:'Output'},
@@ -22,6 +22,11 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'stormData', f
 	$scope.zoomChange = function(zoomType){
 		$rootScope.$broadcast('zoomChange', zoomType);
 	}
+
+	$scope.showLayer = function(layer2show){
+		$rootScope.$broadcast('showLayer', layer2show);
+	}
+
 	//set specific button to start as active
 	$scope.radioModel = 'Road';
 }]);

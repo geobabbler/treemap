@@ -1,0 +1,14 @@
+{
+  "name": "tree",
+  "description": "tree mapping app",
+  "main": "server",
+  "author": "chris hogan & maggie cawley",
+  "homepage": "https://github.com/hoganmaps/tree",
+  "dependencies": {
+    "express": "4.x",
+    "body-parser":"latest",
+    "corser": "latest",
+    "diskspace": "latest",
+    "pg": "latest"
+  }
+}
