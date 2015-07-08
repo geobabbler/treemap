@@ -2,11 +2,15 @@ angular.module('treeData',['ngRoute']).factory('treeData', function($http, $q){
     var _this = this;
 
     this.showTrees = function(data) {
-        console.log(data);
         var defer = $q.defer();
 
-        $http.get('/api/geo/trees?' + data.bbox).success(function(data) {
-                defer.resolve(splitData);
+            var swX = data.bbox._southWest.lng,
+                swY = data.bbox._southWest.lat,
+                neX = data.bbox._northEast.lng,
+                neY = data.bbox._northEast.lat;
+
+        $http.get('/api/geo/trees?neLat=' + neY + '&neLng=' + neX  + '&swLat=' + swY  + '&swLng=' + swX).success(function(data) {
+            defer.resolve(splitData);
             })
             .error(function(e) {
                 console.log(e);

@@ -69,6 +69,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
 		    $rootScope.$on('showLayer', function(e,d){
 		    	var data2send = {bbox: $scope.map.getBounds()};
+		    	console.log($scope.map.getBounds())
 		    	if(d === 'plantings'){
 		    		treeData.showTrees(data2send).then(function(data){
 		    			//success!

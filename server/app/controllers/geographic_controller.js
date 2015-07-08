@@ -30,15 +30,20 @@ object for tables
 */
 
 exports.showTrees = function(req, res, next) {
-    var encodedBBOX = req.params.bbox,
+    // var encodedBBOX = req.params.bbox,
+    var neX = req.params.neLat,
+        neY = req.params.neLng,
+        sqX = req.params.seLat,
+        swY = req.params.seLng,
         zlev = req.params.zlev;
-    console.log(encodedBBOX);
-    var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
+
+    // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
+    console.log(req.params.neLat);
     var filter = req.params.filterID;
 
 
     //if the bounding box has three values come in on param...
-    if(bbox){
+    if(neX && neY){
         pg.connect(connstring, function(err, client, done) {
             var handleError = function(err) {
                 if(!err) return false;
@@ -47,10 +52,10 @@ exports.showTrees = function(req, res, next) {
                 return true;
 
             };
-            var swX = bbox._southWest.lng,
-                swY = bbox._southWest.lat,
-                neX = bbox._northEast.lng,
-                neY = bbox._northEast.lat;
+            // var swX = bbox._southWest.lng,
+            //     swY = bbox._southWest.lat,
+            //     neX = bbox._northEast.lng,
+            //     neY = bbox._northEast.lat;
             // if((zlev > 15) || (zlev == undefined)){
                 if(!filter){
                     var myQuery = 'SELECT common_nam, genus, species, ST_AsGeoJSON(geom) AS geography ' +
