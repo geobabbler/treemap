@@ -35,8 +35,9 @@ exports.showTrees = function(req, res, next) {
         neY = req.params.neLng,
         sqX = req.params.seLat,
         swY = req.params.seLng,
-        zlev = req.params.zlev;
-
+        zlev = 10;
+        // zlev = req.params.zlev;
+      console.log('hi!');
     // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
     console.log(req.params.neLat);
     var filter = req.params.filterID;

@@ -16,7 +16,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 		    // 	'inertia': false,
 		    //     'minZoom': 18,
 		    //     'maxZoom': 6,
-		    //     , 
+		    //     ,
 		    //     'scrollWheelZoom': false,
 		    //     'center': ,
 		    //     'zoom': startZ
@@ -40,23 +40,24 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 			/*
 				this section is for map controlls
 			*/
-		    // $rootScope.$on('baseLayerChange', function(e,d){
-		    // 	if(d === 'road'){
-		    // 		$scope.basemap.addTo(map);
-		    // 		try {
-		    // 			map.removeLayer($scope.satellite);
-		    // 		} catch(err){
-		    // 			//err
-		    // 		}
-		    // 	} else {
-		    // 		$scope.satellite.addTo(map);
-		    // 		try {
-		    // 			map.removeLayer($scope.roads);
-		    // 		} catch(err){
-		    // 			//err
-		    // 		}
-		    // 	}
-		    // });
+		    $rootScope.$on('baseLayerChange', function(e,d){
+		    	if(d === 'road'){
+						console.log('sup');
+		    		$scope.basemap.addTo($scope.map);
+		    		try {
+		    			$scope.map.removeLayer($scope.satellite);
+		    		} catch(err){
+		    			//err
+		    		}
+		    	} else {
+		    		$scope.satellite.addTo($scope.map);
+		    		try {
+		    			$scope.map.removeLayer($scope.roads);
+		    		} catch(err){
+		    			//err
+		    		}
+		    	}
+		    });
 
 		    $rootScope.$on('zoomChange', function(e,d){
 		    	if(d === 'zoomIn'){
@@ -69,7 +70,6 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
 		    $rootScope.$on('showLayer', function(e,d){
 		    	var data2send = {bbox: $scope.map.getBounds()};
-		    	console.log($scope.map.getBounds())
 		    	if(d === 'plantings'){
 		    		treeData.showTrees(data2send).then(function(data){
 		    			//success!

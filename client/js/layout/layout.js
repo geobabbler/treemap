@@ -1,21 +1,12 @@
 var appLayout = angular.module('appLayout',['ngRoute', 'ui.bootstrap']);
 
 appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', function($scope, $rootScope, treeData){
-	$scope.tabs = [
-		{ title:'Main'},
-		{ title:'Output'},
-		{ title:'About'}
-	];
 
-	$scope.zoomInOne = function(){
-		$rootScope.$broadcast('zoomIn');
-	};
-	// $scope.stormData = stormData.processStorms().then(function(Data){
-	// 	return Data;
-	// });
-
+	$scope.projectName = "TreeBaltimore";
+	console.log($scope.viewport);
 	//layer toggler
-	$scope.layerToggle = function(layer){
+	$scope.baseLayerToggle = function(layer){
+		$scope.baseMap = layer;
 		$rootScope.$broadcast('baseLayerChange', layer);
 	};
 
@@ -50,10 +41,10 @@ angular.module( 'appLayout')
 	        templateUrl: 'js/layout/partials/about-tab.tpl.html',
 	        controller: 'layoutController'
 	    };
-	}).directive('sidebarTab',function(){
-	    return {
-	        restrict: 'E',
-	        templateUrl: 'js/layout/partials/sidebar.tpl.html',
-	        controller: 'layoutController'
-	    };
+}).directive('topBar',function(){
+			return {
+					restrict: 'E',
+					templateUrl: 'js/layout/partials/topbar.tpl.html',
+					controller: 'layoutController'
+			};
 	});
