@@ -30,52 +30,45 @@ object for tables
 */
 
 exports.showTrees = function(req, res, next) {
-    // var encodedBBOX = req.params.bbox,
-    var neX = req.params.neLat,
-        neY = req.params.neLng,
-        sqX = req.params.seLat,
-        swY = req.params.seLng,
-        zlev = 10;
-        // zlev = req.params.zlev;
-      console.log('hi!');
+    var neX = req.query.neLat,
+        neY = req.query.neLng,
+        swX = req.query.swLat,
+        swY = req.query.swLng;
     // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
-    console.log(req.params.neLat);
-    var filter = req.params.filterID;
 
 
     //if the bounding box has three values come in on param...
-    if(neX && neY){
+    if(neX && neY && swX && swY){
         pg.connect(connstring, function(err, client, done) {
             var handleError = function(err) {
                 if(!err) return false;
                 done(client);
                 next(err);
                 return true;
-
             };
-            // var swX = bbox._southWest.lng,
-            //     swY = bbox._southWest.lat,
-            //     neX = bbox._northEast.lng,
-            //     neY = bbox._northEast.lat;
-            // if((zlev > 15) || (zlev == undefined)){
-                if(!filter){
-                    var myQuery = 'SELECT common_nam, genus, species, ST_AsGeoJSON(geom) AS geography ' +
-                        'FROM tree_plantingswgs84 ' +
-                        'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swX + ' ' + swY + ',' + neX + ' ' + swY + ',' + neX + ' ' + neY + ',' + swX + ' ' + neY + ',' + swX + ' ' + swY + '))\', 4326 ));'
-                };
+
+                // if(!filter){
+                var myQuery = 'SELECT common_nam, genus, species, year, ST_AsGeoJSON(geom) AS geography ' +
+                    'FROM tree_plantingswgs84 ' +
+                    'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
+                    // 'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swX + ' ' + swY + ',' + neX + ' ' + swY + ',' + neX + ' ' + neY + ',' + swX + ' ' + neY + ',' + swX + ' ' + swY + '))\', 4326 ));'
+                // };
+                console.log(myQuery);
                 //with neighborhood filter
-                if(filter){
-                    console.log(filter);
-                    var myQuery = 'SELECT common_nam, genus, species, ST_AsGeoJSON(geom) AS geography ' +
-                        'FROM tree_plantingswgs84 ' +
-                        'WHERE ST_Within(geom, (SELECT geom FROM neighborhoodwgs84 WHERE id = ' + filter + '));'
-                }
+                // if(filter){
+                //     console.log(filter);
+                //     var myQuery = 'SELECT common_nam, genus, species, ST_AsGeoJSON(geom) AS geography ' +
+                //         'FROM tree_plantingswgs84 ' +
+                //         'WHERE ST_Within(geom, (SELECT geom FROM neighborhoodwgs84 WHERE id = ' + filter + '));'
+                //     console.log(myQuery);
+                // }
 
             client.query(myQuery, function(err, result) {
                 if(result.rowCount == 0) {
                   res.send(500);
                 }
                 else {
+                  console.log(result.rowCount);
                   var featureCollection = new FeatureCollection();
                   for(var i=0; i<result.rowCount; i++){
                     var feature = new Feature();
@@ -83,7 +76,8 @@ exports.showTrees = function(req, res, next) {
                     feature.properties = ({
                         "common_name":result.rows[i].common_nam,
                         "genus":result.rows[i].genus,
-                        "species":result.rows[i].species
+                        "species":result.rows[i].species,
+                        "year": parseInt(result.rows[i].year)
                     })
                     feature.geometry = JSON.parse(result.rows[i].geography);
                     featureCollection.features.push(feature);

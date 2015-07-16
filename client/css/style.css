@@ -25,6 +25,11 @@ html, body {
   margin-top:0;
 }
 
+.navbar-nav {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
 .navbar-toggle {
   margin-right: 5px;
 }
@@ -36,4 +41,13 @@ html, body {
         padding-left: 0;
         padding-right: 0;
     }
+}
+
+.filterbox {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 1000;
+  background-color: white;
+  padding: 5px;
 }
