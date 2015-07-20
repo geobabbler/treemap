@@ -24,7 +24,11 @@ function Feature(){
 object for tables
 */
 
-exports.neighborhoodBounds = function(req, res, next) {
+exports.neighborhoodByBounds = function(req, res, next) {
+  var neX = req.query.neLat,
+      neY = req.query.neLng,
+      swX = req.query.swLat,
+      swY = req.query.swLng;
     pg.connect(connstring, function(err, client, done) {
         var handleError = function(err) {
             if(!err) return false;
@@ -34,7 +38,7 @@ exports.neighborhoodBounds = function(req, res, next) {
 
         };
 
-        var myQuery = 'select label, id, ST_AsGeoJSON(ST_Envelope(geom)) AS geom from neighborhoodwgs84;';
+        var myQuery = 'select label, id, ST_AsGeoJSON(geom) AS geom from neighborhoodwgs84 WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
 
         client.query(myQuery, function(err, result) {
             console.log(result)
@@ -42,17 +46,20 @@ exports.neighborhoodBounds = function(req, res, next) {
               res.send(500);
             }
             else {
-                var nbhdResponse = new Array();
-                for(var i=0; i<result.rowCount; i++){
-                    var item = new Object;
-                    item.label = result.rows[i].label;
-                    item.id = result.rows[i].id;
-                    item.bbox = JSON.parse(result.rows[i].geom);
-                    nbhdResponse.push(item);
-                }
-                res.type('text/javascript');
-                res.jsonp(nbhdResponse);
-                done();
+              var featureCollection = new FeatureCollection();
+              for(var i=0; i<result.rowCount; i++){
+                var feature = new Feature();
+                //feature.properties = ({"city_name":result.rows[i].city_name, "cntry_name":result.rows[i].cntry_name, "pop":result.rows[i].pop});
+                feature.properties = ({
+                    "label":result.rows[i].label,
+                    "id":result.rows[i].id
+                })
+                feature.geometry = JSON.parse(result.rows[i].geom);
+                featureCollection.features.push(feature);
+              }
+              res.type('text/javascript');
+              res.jsonp(featureCollection);
+              done();
             }
         });
     })

@@ -10,8 +10,9 @@ module.exports = function (app) {
     // app.get("/api/status", helperController.showStorageAvailable);
 
     //neighborhoods routes
-    app.get("/api/neighborhood/bounds", neighborhoodController.neighborhoodBounds);
-    app.get("/api/neighborhood/polygons", neighborhoodController.neighborhoodPolygons);
+    // app.get("/api/neighborhood/bounds", neighborhoodController.neighborhoodBounds);
+
+    app.get("/api/neighborhood", neighborhoodController.neighborhoodByBounds);
 
     app.get("/api/geo/trees", geoController.showTrees);
 
