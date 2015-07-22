@@ -41,7 +41,6 @@ exports.neighborhoodByBounds = function(req, res, next) {
         var myQuery = 'select label, id, ST_AsGeoJSON(geom) AS geom from neighborhoodwgs84 WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
 
         client.query(myQuery, function(err, result) {
-            console.log(result)
             if(result.rowCount == 0) {
               res.send(500);
             }
@@ -85,7 +84,6 @@ exports.neighborhoodPolygons = function(req, res, next) {
                   res.send(500);
                 }
                 else {
-                    console.log(result);
                   var featureCollection = new FeatureCollection();
                   var nbhdProps = new Array();
                   for(var i=0; i<result.rowCount; i++){

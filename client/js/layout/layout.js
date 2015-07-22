@@ -13,10 +13,10 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', fu
   $scope.zoomChange = function(zoomType) {
     $rootScope.$broadcast('zoomChange', zoomType);
   }
-
-  $scope.toggleTrees = function(layer2show) {
-    $rootScope.$broadcast('toggleTrees', layer2show);
-  }
+  // 
+  // $scope.toggleTrees = function(layer2show) {
+  //   $rootScope.$broadcast('toggleTrees', layer2show);
+  // }
   //listener events
   $rootScope.$on('treeCount', function(e,d){
     $scope.treeCount = d;

@@ -14,13 +14,13 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.startX = 39.290452,
     $scope.startY = -76.614090,
     $scope.startZ = 16;
-
+    $scope.maxBounds = L.latLngBounds(L.latLng(39.182989, -76.732924), L.latLng(39.408827, -76.500495));
 		/*
      * Mapping / Leaflet parts
     */
 
 		// create map object, set view to be the default map starts
-		$scope.map = L.map('map', {'zoomControl': false});
+		$scope.map = L.map('map', {'zoomControl': false, maxBounds: $scope.maxBounds, minZoom: 12});
 
 		/*
      * Layers
@@ -78,6 +78,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         });
     }
     $scope.neighborhoodsLayer = L.geoJson('', {onEachFeature: $scope.onEachFeature}).addTo($scope.map);
+
     /*
     *	this section is for map events
     */
@@ -107,21 +108,41 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 		*/
 
 		$scope.drawTrees = function(){
-      if($scope.map.getZoom() > 15){
+      if($scope.map.getZoom() >= 16){
   			treeData.showTrees({bbox: $scope.map.getBounds()}).then(function(data) {
+          $scope.showClusterByReducedPrecisionLayer.clearLayers();
   				$rootScope.$broadcast('treeCount', data.features.length);
           $scope.treeLayer.clearLayers();
   				$scope.treeLayer.addData(data);
   				$scope.treeLayer.addTo($scope.map);
+
   			}, function(err) {
-  				console.log(err);
   				//failure!
   			});
       }
-      else {
-        $scope.treeLayer.clearLayers();
-        console.log('zoom in to see trees');
+      if(($scope.map.getZoom() > 14 )&&($scope.map.getZoom() < 16)) {
+        treeData.clusterByReducedPrecision({precision: 4, bbox: $scope.map.getBounds()}).then(function(data) {
+          $scope.treeLayer.clearLayers();
+          $rootScope.$broadcast('treeCount', data.total);
+          $scope.showClusterByReducedPrecisionLayer.clearLayers();
+          $scope.showClusterByReducedPrecisionLayer.addData(data);
+          $scope.showClusterByReducedPrecisionLayer.bringToBack();
+  			}, function(err) {
+  				//failure!
+  			});
       }
+      if($scope.map.getZoom() < 15) {
+        treeData.clusterByReducedPrecision({precision: 3, bbox: $scope.map.getBounds()}).then(function(data) {
+          $scope.treeLayer.clearLayers();
+          $rootScope.$broadcast('treeCount', data.total);
+          $scope.showClusterByReducedPrecisionLayer.clearLayers();
+          $scope.showClusterByReducedPrecisionLayer.addData(data);
+          $scope.showClusterByReducedPrecisionLayer.bringToBack();
+        }, function(err) {
+          //failure!
+        });
+      }
+
 		};
 
     $scope.neighborhoods = function() {
@@ -146,6 +167,44 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         $scope.neighborhoods();
     }
 
+    function getSize(d) {
+      return d >= 40 ? 20 :
+             d >= 21 ? 15 :
+             d >= 6 ? 10 :
+             d >= 1 ? 4 :
+                        0;
+    }
+
+    $scope.showClusterByReducedPrecisionLayer = L.geoJson('',{
+      pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: getSize(feature.properties.count),
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+          }).addTo($scope.map);
+        }
+      }).addTo($scope.map);
+    $scope.showClusterByReducedPrecision = false;
+
+    $scope.toggleClusterByReducedPrecision = function(){
+      $scope.showClusterByReducedPrecision = !$scope.showClusterByReducedPrecision;
+      if($scope.showClusterByReducedPrecision == true){
+        var markers = L.markerClusterGroup();
+        treeData.clusterByReducedPrecision().then(function(data) {
+          $scope.showClusterByReducedPrecisionLayer.clearLayers();
+          $scope.showClusterByReducedPrecisionLayer.addData(data);
+          $scope.showClusterByReducedPrecisionLayer.bringToBack();
+  			}, function(err) {
+  				//failure!
+  			});
+      }
+      else {
+        $scope.showClusterByReducedPrecisionLayer.clearLayers();
+      }
+    }
 
     $scope.map.on('moveend', $scope.drawTrees);
     $scope.map.on('load', $scope.drawTrees);
