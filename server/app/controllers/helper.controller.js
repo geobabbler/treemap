@@ -3,72 +3,92 @@
 var env = require('../../config/env.js'),
     environment = new env(),
     connstring = environment.connstring;
-    
+
 var pg = require('pg');
 
-/**
- * A module that defines the response format.
- * @module app_schema_controller
- */
-var fs = require('fs'),
-	diskspace = require('diskspace');
+exports.treeStats = function(req, res, next) {
+    var neX = req.query.neLat,
+        neY = req.query.neLng,
+        swX = req.query.swLat,
+        swY = req.query.swLng;
+    // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
 
-exports.showAPIdocs = function(req, res) {
-	var update = 'GISAPI Workshop API Docs</br>' + 
-        		 '</br></br><b>Helpers</b></br>' +
-        		 'GET /api</br>' +
-        		 'GET /api/showStorageAvailable</br></br></br>' +
-        		 '<b>Geo Services</b></br>' + 
-        		 'GET /api/boundingBox </br>' + 
-        		 'GET /api/overlap </br>' + 
-        		 'GET /api/simplify </br>' + 
-        		 'GET /api/buffer </br>' + 
-        		 'GET /api/funFilter'
-    res.send(update)
-}
 
-exports.showStorageAvailable = function(req, res) {
-	diskspace.check('/', function (total, free, status){
-		//convert to gigabytes
-	    res.jsonp({
-	    	total:(total/1000000000),
-	    	free:(free/1000000000),
-	    	status:status
-	    })
-	});
-}
-
-exports.homicideDateRange = function(req, res){
-	pg.connect(connstring, function(err, client, done) {
-		console.log(err)
+    //if the bounding box has three values come in on param...
+    if(neX && neY && swX && swY){
+        pg.connect(connstring, function(err, client, done) {
             var handleError = function(err) {
-            	console.log(err)
                 if(!err) return false;
                 done(client);
                 next(err);
                 return true;
-
             };
 
-            var myQuery = "SELECT  min(crimedate) as start_date, max(crimedate) as end_date FROM homicides;"
+                // if(!filter){
+                var myQuery = 'SELECT common_nam, genus, species, year, ST_AsGeoJSON(geom) AS geography ' +
+                    'FROM tree_plantingswgs84 ' +
+                    'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
 
-            // console.log(myQuery)
-
+                // var getStatus = 'SELECT count(gid) as total ' +
+                //         'FROM tree_plantingswgs84 ' +
+                //         'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 )) ' +
+                //         'GROUP BY year;'
+                    // 'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swX + ' ' + swY + ',' + neX + ' ' + swY + ',' + neX + ' ' + neY + ',' + swX + ' ' + neY + ',' + swX + ' ' + swY + '))\', 4326 ));'
+                // };
+                //with neighborhood filter
+                // if(filter){
+                //     console.log(filter);
+                //     var myQuery = 'SELECT common_nam, genus, species, ST_AsGeoJSON(geom) AS geography ' +
+                //         'FROM tree_plantingswgs84 ' +
+                //         'WHERE ST_Within(geom, (SELECT geom FROM neighborhoodwgs84 WHERE id = ' + filter + '));'
+                //     console.log(myQuery);
+                // }
+                // var featureCollection = new FeatureCollection();
+              // client.query(getStatus, function(err, result){
+              //   var sendOut = {}
+              //   console.log('1',err)
+              //   console.log('5',result)
+              //   if(result.rowCount) {
+              //     console.log('huh')
+              //     res.send(500);
+              //   }
+              //   else {
+              //     for (var a = 0; a < result.rowCount; a ++){
+              //       if(result.rows[a]){
+              //         sendOut[result.rows[a]] = sendOut[result.rows[a]] + total
+              //       }
+              //     }
+              //   }
+              //   console.log(sendOut.rows)
+              //   // featureCollection.properties[sendOut];
+              // })
             client.query(myQuery, function(err, result) {
-                // console.log(result.rowCount)
-                console.log(result)
                 if(result.rowCount == 0) {
                   res.send(500);
-                } 
+                }
                 else {
-                	res.type('text/javascript');
-                  	res.jsonp({
-                  		start_date: result.rows[0].start_date,
-                  		end_date: result.rows[0].end_date
-                  	});
-                  
+                  var featureCollection = new FeatureCollection();
+                  for(var i=0; i<result.rowCount; i++){
+                    var feature = new Feature();
+                    //feature.properties = ({"city_name":result.rows[i].city_name, "cntry_name":result.rows[i].cntry_name, "pop":result.rows[i].pop});
+                    feature.properties = ({
+                        "common_name":result.rows[i].common_nam,
+                        "genus":result.rows[i].genus,
+                        "species":result.rows[i].species,
+                        "year": parseInt(result.rows[i].year)
+                    })
+                    feature.geometry = JSON.parse(result.rows[i].geography);
+                    featureCollection.features.push(feature);
+                  }
+                  res.type('text/javascript');
+                  res.jsonp(featureCollection);
                   done();
                 }
             });
         })
+
+    }
+    else{
+        //send failuer
+    }
 }

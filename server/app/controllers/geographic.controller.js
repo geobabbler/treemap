@@ -51,6 +51,11 @@ exports.showTrees = function(req, res, next) {
                 var myQuery = 'SELECT common_nam, genus, species, year, ST_AsGeoJSON(geom) AS geography ' +
                     'FROM tree_plantingswgs84 ' +
                     'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
+
+                // var getStatus = 'SELECT count(gid) as total ' +
+                //         'FROM tree_plantingswgs84 ' +
+                //         'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 )) ' +
+                //         'GROUP BY year;'
                     // 'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swX + ' ' + swY + ',' + neX + ' ' + swY + ',' + neX + ' ' + neY + ',' + swX + ' ' + neY + ',' + swX + ' ' + swY + '))\', 4326 ));'
                 // };
                 //with neighborhood filter
@@ -61,7 +66,25 @@ exports.showTrees = function(req, res, next) {
                 //         'WHERE ST_Within(geom, (SELECT geom FROM neighborhoodwgs84 WHERE id = ' + filter + '));'
                 //     console.log(myQuery);
                 // }
-
+                // var featureCollection = new FeatureCollection();
+              // client.query(getStatus, function(err, result){
+              //   var sendOut = {}
+              //   console.log('1',err)
+              //   console.log('5',result)
+              //   if(result.rowCount) {
+              //     console.log('huh')
+              //     res.send(500);
+              //   }
+              //   else {
+              //     for (var a = 0; a < result.rowCount; a ++){
+              //       if(result.rows[a]){
+              //         sendOut[result.rows[a]] = sendOut[result.rows[a]] + total
+              //       }
+              //     }
+              //   }
+              //   console.log(sendOut.rows)
+              //   // featureCollection.properties[sendOut];
+              // })
             client.query(myQuery, function(err, result) {
                 if(result.rowCount == 0) {
                   res.send(500);

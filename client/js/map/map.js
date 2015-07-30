@@ -43,13 +43,12 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 		$scope.treeLayer = L.geoJson('', {
 			style: function(feature) {
 				switch (feature.properties.year) {
-					case 2010: return { fillColor: "#fed976"};
 					case 2011: return { fillColor: "#feb24c"};
 					case 2012: return { fillColor: "#fd8d3c"};
 					case 2013: return { fillColor: "#fc4e2a"};
 					case 2014: return { fillColor: "#e31a1c"};
 					case 2015: return { fillColor: "#b10026"};
-					default: return { fillColor: "blue"};
+					default: return { fillColor: "#feb24c"};
 				}
 			},
 			pointToLayer: function(feature, latlng) {
@@ -110,6 +109,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 		$scope.drawTrees = function(){
       if($scope.map.getZoom() >= 16){
   			treeData.showTrees({bbox: $scope.map.getBounds()}).then(function(data) {
+
           $scope.showClusterByReducedPrecisionLayer.clearLayers();
   				$rootScope.$broadcast('treeCount', data.features.length);
           $scope.treeLayer.clearLayers();

@@ -1,3 +1,24 @@
-<div class="filterbox">
-  {{treeCount}} Trees in view
+<div class="filterbox" ng-mouseenter="showFilters()" ng-mouseleave="hideFilters()">
+  <div class="col-md-12" ng-hide="filterOn">
+    {{treeCount}} Trees Visible
+  </div>
+  <div class="col-md-12" ng-show="filterOn">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="info legend">
+          <i style="background:#feb24c"></i> 2011 & Before </br>
+          <i style="background:#fd8d3c"></i> 2012</br>
+          <i style="background:#fc4e2a"></i> 2013</br>
+          <i style="background:#e31a1c"></i> 2014</br>
+          <i style="background:#b10026"></i> 2015
+        </div>
+      </div>
+      <div class="col-md-4">
+        cats
+        cats
+        cats
+      </div>
+    </div>
+    {{treeCount}} Trees Visible
+  </div>
 </div>

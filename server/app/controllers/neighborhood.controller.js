@@ -48,7 +48,6 @@ exports.neighborhoodByBounds = function(req, res, next) {
               var featureCollection = new FeatureCollection();
               for(var i=0; i<result.rowCount; i++){
                 var feature = new Feature();
-                //feature.properties = ({"city_name":result.rows[i].city_name, "cntry_name":result.rows[i].cntry_name, "pop":result.rows[i].pop});
                 feature.properties = ({
                     "label":result.rows[i].label,
                     "id":result.rows[i].id

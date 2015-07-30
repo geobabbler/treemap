@@ -1,5 +1,6 @@
 var neighborhoodController = require('./controllers/neighborhood.controller.js'),
-    geoController = require('./controllers/geographic_controller');
+    helperController = require('./controllers/helper.controller'),
+    geoController = require('./controllers/geographic.controller');
 
 module.exports = function (app) {
     // set up the routes themselves
@@ -7,4 +8,6 @@ module.exports = function (app) {
 
     app.get("/api/geo/trees", geoController.showTrees);
     app.get("/api/geo/clusterByReducedPrecision/:precision", geoController.clusterByReducedPrecision);
+
+    app.get("/api/stats/trees", geoController.showTrees);
 };

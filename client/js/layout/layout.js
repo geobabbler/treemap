@@ -13,7 +13,7 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', fu
   $scope.zoomChange = function(zoomType) {
     $rootScope.$broadcast('zoomChange', zoomType);
   }
-  // 
+  //
   // $scope.toggleTrees = function(layer2show) {
   //   $rootScope.$broadcast('toggleTrees', layer2show);
   // }
@@ -23,6 +23,13 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', fu
   });
   if(!$scope.treeCount){
     $scope.treeCount = 0;
+  }
+
+  $scope.showFilters = function(){
+    $scope.filterOn = true;
+  }
+  $scope.hideFilters = function(){
+    $scope.filterOn = false;
   }
 }]);
 
