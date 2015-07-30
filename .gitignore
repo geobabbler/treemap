@@ -9,3 +9,4 @@ log*
 .project
 .settings
 bin
+server/config/env.js

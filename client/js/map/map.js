@@ -15,6 +15,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.startY = -76.614090,
     $scope.startZ = 16;
     $scope.maxBounds = L.latLngBounds(L.latLng(39.182989, -76.732924), L.latLng(39.408827, -76.500495));
+
 		/*
      * Mapping / Leaflet parts
     */
@@ -61,6 +62,13 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 				})
 			}
 		});
+
+
+    /*
+      this empty unstyled geojson feeds the clusters
+    */
+    $scope.clusteredGeoJSON = L.geoJson('');
+
     function highlightFeature(feature, layer) {
         console.log(feature)
     }
@@ -112,6 +120,12 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
           $scope.showClusterByReducedPrecisionLayer.clearLayers();
   				$rootScope.$broadcast('treeCount', data.features.length);
+          try {
+            $scope.map.removeLayer($scope.markers);
+          }
+          catch(err){
+            //
+          }
           $scope.treeLayer.clearLayers();
   				$scope.treeLayer.addData(data);
   				$scope.treeLayer.addTo($scope.map);
@@ -124,9 +138,19 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         treeData.clusterByReducedPrecision({precision: 4, bbox: $scope.map.getBounds()}).then(function(data) {
           $scope.treeLayer.clearLayers();
           $rootScope.$broadcast('treeCount', data.total);
-          $scope.showClusterByReducedPrecisionLayer.clearLayers();
-          $scope.showClusterByReducedPrecisionLayer.addData(data);
-          $scope.showClusterByReducedPrecisionLayer.bringToBack();
+
+          try {
+            $scope.map.removeLayer($scope.markers);
+          }
+          catch(err){
+            //
+          }
+
+          $scope.markers = new L.MarkerClusterGroup({showCoverageOnHover: false});
+          $scope.clusteredGeoJSON.addData(data);
+
+          $scope.markers.addLayer($scope.clusteredGeoJSON);
+          $scope.map.addLayer($scope.markers);
   			}, function(err) {
   				//failure!
   			});
@@ -135,9 +159,18 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         treeData.clusterByReducedPrecision({precision: 3, bbox: $scope.map.getBounds()}).then(function(data) {
           $scope.treeLayer.clearLayers();
           $rootScope.$broadcast('treeCount', data.total);
-          $scope.showClusterByReducedPrecisionLayer.clearLayers();
-          $scope.showClusterByReducedPrecisionLayer.addData(data);
-          $scope.showClusterByReducedPrecisionLayer.bringToBack();
+          try {
+            $scope.map.removeLayer($scope.markers);
+          }
+          catch(err){
+            //
+          }
+
+          $scope.markers = new L.MarkerClusterGroup({showCoverageOnHover: false});
+          $scope.clusteredGeoJSON.addData(data);
+
+          $scope.markers.addLayer($scope.clusteredGeoJSON);
+          $scope.map.addLayer($scope.markers);
         }, function(err) {
           //failure!
         });
@@ -189,22 +222,22 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       }).addTo($scope.map);
     $scope.showClusterByReducedPrecision = false;
 
-    $scope.toggleClusterByReducedPrecision = function(){
-      $scope.showClusterByReducedPrecision = !$scope.showClusterByReducedPrecision;
-      if($scope.showClusterByReducedPrecision == true){
-        var markers = L.markerClusterGroup();
-        treeData.clusterByReducedPrecision().then(function(data) {
-          $scope.showClusterByReducedPrecisionLayer.clearLayers();
-          $scope.showClusterByReducedPrecisionLayer.addData(data);
-          $scope.showClusterByReducedPrecisionLayer.bringToBack();
-  			}, function(err) {
-  				//failure!
-  			});
-      }
-      else {
-        $scope.showClusterByReducedPrecisionLayer.clearLayers();
-      }
-    }
+    // $scope.toggleClusterByReducedPrecision = function(){
+    //   $scope.showClusterByReducedPrecision = !$scope.showClusterByReducedPrecision;
+    //   if($scope.showClusterByReducedPrecision == true){
+    //     var markers = L.markerClusterGroup();
+    //     treeData.clusterByReducedPrecision().then(function(data) {
+    //       $scope.showClusterByReducedPrecisionLayer.clearLayers();
+    //       $scope.showClusterByReducedPrecisionLayer.addData(data);
+    //       $scope.showClusterByReducedPrecisionLayer.bringToBack();
+  	// 		}, function(err) {
+  	// 			//failure!
+  	// 		});
+    //   }
+    //   else {
+    //     $scope.showClusterByReducedPrecisionLayer.clearLayers();
+    //   }
+    // }
 
     $scope.map.on('moveend', $scope.drawTrees);
     $scope.map.on('load', $scope.drawTrees);
