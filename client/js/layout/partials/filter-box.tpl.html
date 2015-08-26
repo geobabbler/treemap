@@ -1,24 +1,27 @@
 <div class="filterbox" ng-mouseenter="showFilters()" ng-mouseleave="hideFilters()">
   <div class="col-md-12" ng-hide="filterOn">
-    {{treeCount}} Trees Visible
+    {{treeCount}}
+    Trees Visible
   </div>
-  <div class="col-md-12" ng-show="filterOn">
+  <div class="col-md-12 col-lg-12" ng-show="filterOn">
     <div class="row">
-      <div class="col-md-8">
-        <div class="info legend">
-          <i style="background:#feb24c"></i> 2011 & Before </br>
-          <i style="background:#fd8d3c"></i> 2012</br>
-          <i style="background:#fc4e2a"></i> 2013</br>
-          <i style="background:#e31a1c"></i> 2014</br>
-          <i style="background:#b10026"></i> 2015
-        </div>
-      </div>
-      <div class="col-md-4">
-        cats
-        cats
-        cats
-      </div>
+      <table class="table">
+        <tbody class="info legend">
+          <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig">
+            <td>
+              <i style="background:{{year.color}}"></i>
+            </td>
+            <td>{{year.label}}
+              <b>({{year.count}})</b>
+            </td>
+            <td ng-click="toggleTreeYear(year.label)">
+              <small>hide</small>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    {{treeCount}} Trees Visible
+    {{treeCount}}
+    Trees Visible
   </div>
 </div>

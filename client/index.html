@@ -1,41 +1,40 @@
-
 <!DOCTYPE html>
 <html ng-app="app">
-	<head>
-		<title>TreeBaltimore</title>
-		<meta charset="utf-8" />
+  <head>
+    <title>TreeBaltimore</title>
+    <meta charset="utf-8"/>
 
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="bower_components/bootswatch/paper//bootstrap.min.css" />
-		<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
-		<link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-		<!-- <link rel="stylesheet" href="bower_components/leaflet.label/dist/leaflet.label.css" /> -->
-		<link rel="stylesheet" href="css/style.css" />
-		<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="bower_components/bootswatch/paper//bootstrap.min.css" rel="stylesheet"/>
+    <link href="bower_components/leaflet/dist/leaflet.css" rel="stylesheet"/>
+    <link href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" rel="stylesheet"/>
+<!-- <link rel="stylesheet" href="bower_components/leaflet.label/dist/leaflet.label.css" /> -->
+    <link href="css/style.css" rel="stylesheet"/>
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
-		<script src="bower_components/angular/angular.js"></script>
-		<script src="bower_components/leaflet/dist/leaflet.js"></script>
-		<script src="bower_components/Leaflet.label/dist/leaflet.label.js"></script>
-		<script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-		<script src="bower_components/angular-route/angular-route.js"></script>
-		<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
-		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-		<script src="js/app.js"></script>
-		<script src="js/layout/layout.js"></script>
-		<script src="js/services/treeData.js"></script>
-		<script src="js/map/map.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="bower_components/Leaflet.label/dist/leaflet.label.js"></script>
+    <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/layout/layout.js"></script>
+    <script src="js/services/treeData.js"></script>
+    <script src="js/map/map.js"></script>
 
-	</head>
-	<body ng-controller="layoutController">
-		<!-- <div id="wrapper">
+  </head>
+  <body ng-controller="layoutController">
+<!-- <div id="wrapper">
 		    <sidebar-tab></sidebar-tab>
 		  </div> -->
-			<top-bar></top-bar>
-			<div class="container">
-				<div class="row">
-					<filter-box></filter-box>
-		  		<map></map>
-				</div>
-			</div>
-	</body>
+    <top-bar></top-bar>
+    <div class="container">
+      <div class="row">
+        <filter-box></filter-box>
+        <map></map>
+      </div>
+    </div>
+  </body>
 </html>
