@@ -69,3 +69,11 @@ end: aped from the leaflet examples
   padding-right: 2px;
   vertical-align: middle;
 }
+
+.table {
+  margin-bottom: 4px;
+}
+
+.filterbox-subtext {
+  padding-left: 8px;
+}

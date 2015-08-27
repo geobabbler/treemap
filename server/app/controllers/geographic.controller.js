@@ -36,7 +36,6 @@ exports.showTrees = function(req, res, next) {
     swY = req.query.swLng,
     filter = req.query.filter;
 
-  console.log(filter);
   // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
 
 
