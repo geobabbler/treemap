@@ -7,15 +7,12 @@
     <div class="row">
       <table class="table">
         <tbody class="info legend">
-          <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig | orderObjectBy:'order'">
+          <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig | orderObjectBy:'order'" ng-click="toggleTreeYear(year.label)">
             <td>
               <i style="background:{{year.color}}"></i>
             </td>
             <td>{{year.label}}
               <b>({{year.count}})</b>
-            </td>
-            <td ng-click="toggleTreeYear(year.label)">
-              <small>hide</small>
             </td>
           </tr>
         </tbody>
