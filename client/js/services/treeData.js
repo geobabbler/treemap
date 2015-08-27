@@ -47,6 +47,21 @@ angular.module('treeData',['ngRoute']).factory('treeData', function($http, $q){
         return defer.promise;
     }
 
+    this.getZoomNeighborhoods = function(data) {
+        var defer = $q.defer();
+
+        var searchString = data.val;
+        $http.get('/api/neighborhoodNames?searchString=' + String(searchString))
+          .success(function(outData) {
+              defer.resolve(outData);
+            })
+            .error(function(e) {
+                defer.reject('could not find treedat');
+            });
+
+        return defer.promise;
+    }
+
     this.clusterByReducedPrecision = function(data){
         var defer = $q.defer();
 

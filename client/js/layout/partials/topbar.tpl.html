@@ -1,57 +1,71 @@
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-init="baseMap='road'">
-          <!-- Brand and toggle get grouped for better mobile display -->
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="fa fa-caret-down fa-4"></span>
-            </button>
-            <button type="button" class="navbar-toggle" ng-click="baseLayerToggle('satellite')" ng-show="baseMap === 'road'">
-              <span class="sr-only">Toggle Satellite View</span>
-              <span class="fa fa-globe fa-fw"></span>
-            </button>
-            <button type="button" class="navbar-toggle" ng-click="baseLayerToggle('road')" ng-show="baseMap === 'satellite'">
-              <span class="sr-only">Toggle Map View</span>
-              <span class="fa fa-road fa-fw"></span>
-            </button>
-            <button type="button" class="navbar-toggle" ng-click="zoomChange('zoomIn')">
-              <span class="sr-only">Zoom In</span>
-              <span class="fa fa-plus fa-6"></span>
-            </button>
-            <button type="button" class="navbar-toggle" ng-click="zoomChange('zoomOut')">
-              <span class="sr-only">Zoom Out</span>
-              <span class="fa fa-minus fa-6"></span>
-            </button>
-            <a class="navbar-brand" href="#">{{projectName}}</a>
+<div class="navbar navbar-default navbar-fixed-top" ng-init="baseMap='road'" role="navigation">
+<!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button class="navbar-toggle" ng-click="navCollapsed = !navCollapsed" ng-init="navCollapsed = true" type="button">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="fa fa-caret-down fa-4"></span>
+    </button>
+    <button class="navbar-toggle" ng-click="baseLayerToggle('satellite')" ng-show="baseMap === 'road'" type="button">
+      <span class="sr-only">Toggle Satellite View</span>
+      <span class="fa fa-globe fa-fw"></span>
+    </button>
+    <button class="navbar-toggle" ng-click="baseLayerToggle('road')" ng-show="baseMap === 'satellite'" type="button">
+      <span class="sr-only">Toggle Map View</span>
+      <span class="fa fa-road fa-fw"></span>
+    </button>
+    <button class="navbar-toggle" ng-click="zoomChange('zoomIn')" type="button">
+      <span class="sr-only">Zoom In</span>
+      <span class="fa fa-plus fa-6"></span>
+    </button>
+    <button class="navbar-toggle" ng-click="zoomChange('zoomOut')" type="button">
+      <span class="sr-only">Zoom Out</span>
+      <span class="fa fa-minus fa-6"></span>
+    </button>
+    <a class="navbar-brand" ng-click="aboutModal();">{{projectName}}</a>
+  </div>
+<!-- Collect the nav links, forms, and other content for toggling -->
+  <div class="collapse navbar-collapse" collapse="navCollapsed">
+    <ul class="nav navbar-nav">
+      <li>
+        <a ng-click="toggleNeighborhoods();" style="padding-right: 3px;">Show Neighborhood Boundaries</a>
+      </li>
+      <li>
+        <form class="navbar-form" role="search">
+          <div class="form-group">
+            <input class="form-control" class="form-control" ng-model="neighborhoodNameSelected" placeholder="Filter by Neighborhood" type="text" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="zoomToHood($item)" typeahead="address.properties.label for address in neighborhoodTextInput($viewValue)">
+            <i class="glyphicon glyphicon-refresh" ng-show="loadingLocations"></i>
+            <div ng-show="noResults">
+              <i class="glyphicon glyphicon-remove"></i>
+              No Results Found
+            </div>
           </div>
-          <!-- Collect the nav links, forms, and other content for toggling -->
-          <div class="collapse navbar-collapse" collapse="navCollapsed">
-            <ul class="nav navbar-nav">
-              <li>
-                <a style="padding-right: 3px;" ng-click="toggleNeighborhoods();">Show Neighborhoods</a>
-              </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right hidden-xs" >
-              <li>
-                <a href="#" ng-click="baseLayerToggle('satellite')" ng-show="baseMap === 'road'">
-                  <span class="fa fa-globe fa-fw"></span>
-                </a>
-              </li>
-              <li>
-                <a href="#" ng-click="baseLayerToggle('road')" ng-show="baseMap === 'satellite'">
-                  <span class="fa fa-road fa-fw"></span>
-                </a>
-              </li>
-              <li>
-                <a href="#" ng-click="zoomChange('zoomIn')">
-                  <span class="fa fa-plus fa-fw"></span>
-                </a>
-              </li>
-              <li>
-                <a href="#" ng-click="zoomChange('zoomOut')">
-                  <span class="fa fa-minus fa-fw"></span>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <!-- /.navbar-collapse -->
-        </div>
+
+        </form>
+      </li>
+    </ul>
+
+    <ul class="nav navbar-nav navbar-right hidden-xs">
+      <li>
+        <a href="#" ng-click="baseLayerToggle('satellite')" ng-show="baseMap === 'road'">
+          <span class="fa fa-globe fa-fw"></span>
+        </a>
+      </li>
+      <li>
+        <a href="#" ng-click="baseLayerToggle('road')" ng-show="baseMap === 'satellite'">
+          <span class="fa fa-road fa-fw"></span>
+        </a>
+      </li>
+      <li>
+        <a href="#" ng-click="zoomChange('zoomIn')">
+          <span class="fa fa-plus fa-fw"></span>
+        </a>
+      </li>
+      <li>
+        <a href="#" ng-click="zoomChange('zoomOut')">
+          <span class="fa fa-minus fa-fw"></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+<!-- /.navbar-collapse -->
+</div>

@@ -14,7 +14,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.startX = 39.290452,
       $scope.startY = -76.614090,
       $scope.startZ = 16;
-    $scope.maxBounds = L.latLngBounds(L.latLng(39.182989, -76.732924), L.latLng(39.408827, -76.500495));
+    $scope.maxBounds = L.latLngBounds(L.latLng(39.0, -76.7), L.latLng(39.6, -76.4));
 
     /*
      * Mapping / Leaflet parts
@@ -50,8 +50,21 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     */
     $scope.clusteredGeoJSON = L.geoJson('');
 
+    $scope.neighborhoodPolyStyle = function(feat) {
+      return {
+        // fillColor: '#7F9A65',
+        // weight: 2,
+        // opacity: 1,
+        color: '#7F9A65',
+        // fillOpacity: 0.7,
+        className: 'borders',
+        clickable: false
+      };
+    }
+
     $scope.neighborhoodsLayer = L.geoJson('', {
-      onEachFeature: $scope.onEachFeature
+      onEachFeature: $scope.onEachFeature,
+      style: $scope.neighborhoodPolyStyle
     }).addTo($scope.map);
 
     /*

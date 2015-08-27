@@ -64,10 +64,10 @@ exports.neighborhoodByBounds = function(req, res, next) {
 
 }
 
-exports.neighborhoodPolygons = function(req, res, next) {
-    var label = req.query.label;
+exports.neighborhoodNamesBBox = function(req, res, next) {
+    var searchString = req.query.searchString;
     //if label is passed in
-    if(label){
+    if(searchString){
         pg.connect(connstring, function(err, client, done) {
             var handleError = function(err) {
                 if(!err) return false;
@@ -76,7 +76,7 @@ exports.neighborhoodPolygons = function(req, res, next) {
                 return true;
             };
 
-            var myQuery = "SELECT label, id, ST_AsGeoJSON(geom) AS geography FROM neighborhoodwgs84 WHERE LOWER(label) = LOWER('" + label + "');"
+            var myQuery = "SELECT label, ST_AsGeoJSON(ST_Envelope(geom)) AS geom FROM neighborhoodwgs84 WHERE LOWER(label) LIKE LOWER('%" + searchString + "%') LIMIT 6;"
             client.query(myQuery, function(err, result) {
                 // console.log(result.rowCount)
                 if(result.rowCount == 0) {
@@ -86,9 +86,11 @@ exports.neighborhoodPolygons = function(req, res, next) {
                   var featureCollection = new FeatureCollection();
                   var nbhdProps = new Array();
                   for(var i=0; i<result.rowCount; i++){
-                    var item = new Object;
                     var feature = new Feature();
-                    feature.geometry = JSON.parse(result.rows[i].geography);
+                    feature.properties = ({
+                        "label":result.rows[i].label
+                    })
+                    feature.geometry = JSON.parse(result.rows[i].geom);
                     featureCollection.features.push(feature);
                   }
                   res.type('text/javascript');

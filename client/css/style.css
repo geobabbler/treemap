@@ -77,3 +77,17 @@ end: aped from the leaflet examples
 .filterbox-subtext {
   padding-left: 8px;
 }
+
+
+/*
+  neighborhoods fill
+*/
+
+.borders {
+  fill: none;
+  strike: none;
+  position: relative;
+  /*stroke: '#7F9A65';*/
+  stroke-opacity: .4;
+  stroke-width: 12px;
+}

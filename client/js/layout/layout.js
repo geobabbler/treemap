@@ -1,6 +1,7 @@
 var appLayout = angular.module('appLayout', ['ngRoute', 'ui.bootstrap']);
 
-appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', function($scope, $rootScope, treeData) {
+appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', '$modal',
+  function($scope, $rootScope, treeData, $modal) {
 
   $scope.projectName = "TreeBaltimore";
 
@@ -13,10 +14,21 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', fu
   $scope.zoomChange = function(zoomType) {
     $rootScope.$broadcast('zoomChange', zoomType);
   }
-  //
-  // $scope.toggleTrees = function(layer2show) {
-  //   $rootScope.$broadcast('toggleTrees', layer2show);
-  // }
+
+  $scope.neighborhoodTextInput = function(val) {
+    return treeData.getZoomNeighborhoods({val:val}).then(function(response){
+        // return response;
+      return response.features.map(function(item){
+        return item;
+      });
+    });
+  };
+
+  $scope.zoomToHood = function($item){
+    var gotobounds = L.geoJson($item).getBounds();
+    $scope.map.fitBounds(gotobounds);
+  }
+
   //listener events
   $rootScope.$on('treeCount', function(e,d){
     $scope.treeCount = d;
@@ -31,6 +43,27 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', fu
   $scope.hideFilters = function(){
     $scope.filterOn = false;
   }
+
+  $scope.aboutModal = function (size) {
+
+    var modalInstance = $modal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'js/layout/partials/about-modal.tpl.html',
+      controller: 'layoutController',
+      size: size,
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      console.log('Modal dismissed at: ' + new Date());
+    });
+  };
 }]);
 
 angular.module('appLayout')
@@ -44,12 +77,6 @@ angular.module('appLayout')
     return {
       restrict: 'E',
       templateUrl: 'js/layout/partials/output-tab.tpl.html',
-      controller: 'layoutController'
-    };
-  }).directive('aboutTab', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'js/layout/partials/about-tab.tpl.html',
       controller: 'layoutController'
     };
   }).directive('topBar', function() {
