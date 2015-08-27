@@ -7,7 +7,7 @@
     <div class="row">
       <table class="table">
         <tbody class="info legend">
-          <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig">
+          <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig | orderObjectBy:'order'">
             <td>
               <i style="background:{{year.color}}"></i>
             </td>

@@ -3,6 +3,6 @@ angular.module('app', [
 	'appLayout',
 	'treeData',
 	'mapStuff',
-	'ui.bootstrap'
+	'ui.bootstrap',
+	'filters'
 ]);
-

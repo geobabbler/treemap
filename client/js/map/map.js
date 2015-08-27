@@ -84,26 +84,31 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
     $scope.treeConfig = {
       "other": {
+        "order": 1,
         "label": "Before 2010",
         "color": "#feb24c",
         "count": 0
       },
       "2010": {
+        "order": 2,
         "label": "2010",
         "color": "#fd8d3c",
         "count": 0
       },
       "2011": {
+        "order": 3,
         "label": "2011",
         "color": "#fc4e2a",
         "count": 0
       },
       "2012": {
+        "order": 4,
         "label": "2012",
         "color": "#e31a1c",
         "count": 0
       },
       "2013": {
+        "order": 5,
         "label": "2013",
         "color": "#b10026",
         "count": 0
@@ -297,7 +302,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       } else {
         $scope.disabledYearArray.splice(indexOf.call($scope.disabledYearArray, year), 1);
       }
-      console.log($scope.disabledYearArray);
+      $scope.drawTrees();
     }
 
     function getSize(d) {

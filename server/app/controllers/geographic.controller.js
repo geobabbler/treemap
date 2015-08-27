@@ -35,6 +35,8 @@ exports.showTrees = function(req, res, next) {
     swX = req.query.swLat,
     swY = req.query.swLng,
     filter = req.query.filter;
+
+  console.log(filter);
   // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
 
 
@@ -51,9 +53,12 @@ exports.showTrees = function(req, res, next) {
       // if(!filter){
       var myQuery = 'SELECT common_nam, genus, species, year, ST_AsGeoJSON(geom) AS geography ' +
         'FROM tree_plantingswgs84 ' +
-        'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
+        'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ))'
 
-      console.log(myQuery);
+      if (filter) {
+        myQuery += ' and year::int != all (array[' + filter + ']);'
+      }
+
       client.query(myQuery, function(err, result) {
         if (result.rowCount == 0) {
           res.send(500);
