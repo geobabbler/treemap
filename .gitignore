@@ -1,6 +1,6 @@
 .DS_Store
 .c9
-node_modules
+server/node_modules
 .tmp
 build
 .gradle
@@ -10,3 +10,4 @@ log*
 .settings
 bin
 server/config/env.js
+npm-debug.log

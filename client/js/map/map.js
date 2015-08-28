@@ -134,18 +134,27 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         layer.on('mouseover', function(e) {
           var hover_bubble = new L.Rrose({
               offset: new L.Point(0, -2),
-              closeButton: false
+              closeButton: false,
+              autoPan: false,
+              y_bounds: 149
             })
-            .setContent('<b>plant year: </b>' + String(feature.properties.year) +
-                        '</br><b>common name: </b>' + feature.properties.common_name +
-                        '</br><b>genus: </b>' + feature.properties.genus +
-                        '</br><b>species: </b>' + feature.properties.species)
+            .setContent('<div class="row" style="text-align: center;">' +
+                          '<i class="fa fa-leaf"></i>' +
+                        '</div>' +
+                        '<hr>' +
+                        '<div class="row">' +
+                          '<b>plant year: </b>' + String(feature.properties.year) +
+                          '</br><b>common name: </b>' + feature.properties.common_name +
+                          '</br><b>genus: </b>' + feature.properties.genus +
+                          '</br><b>species: </b>' + feature.properties.species +
+                        '</div>'+
+                      '</div>')
             .setLatLng(e.latlng)
             .openOn($scope.map);
         });
-        layer.on('mouseout', function(e) {
-          $scope.map.closePopup()
-        });
+        // layer.on('mouseout', function(e) {
+        //   $scope.map.closePopup()
+        // });
       },
       style: function(feature) {
         switch (String(feature.properties.year)) {

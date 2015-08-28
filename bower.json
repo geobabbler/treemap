@@ -23,7 +23,7 @@
     "bootswatch":"3.3.4",
     "Leaflet.label": "0.2.1",
     "leaflet.markercluster": "0.4.0",
-    "rrose": "https://github.com/erictheise/rrose.git"
+    "rrose": "https://github.com/hoganmaps/rrose.git"
   },
   "resolutions": {
     "angular": "1.4.1"

@@ -97,3 +97,12 @@ end: aped from the leaflet examples
   -webkit-border-radius: 0;
   border-radius: 0;
 }
+
+.fa-leaf {
+  font-size: 36px;
+  color: #7F9A65;
+}
+
+hr {
+  margin: 9px;
+}
