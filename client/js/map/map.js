@@ -144,7 +144,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
                         '<hr>' +
                         '<div class="row">' +
                           '<b>plant year: </b>' + String(feature.properties.year) +
-                          '</br><b>common name: </b>' + feature.properties.common_name +
+                          '</br><b>common name: </b>' + (feature.properties.common_name).replace(/�/g,'') +
                           '</br><b>genus: </b>' + feature.properties.genus +
                           '</br><b>species: </b>' + feature.properties.species +
                         '</div>'+
