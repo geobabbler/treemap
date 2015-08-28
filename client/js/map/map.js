@@ -130,6 +130,23 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
     //empty layer for the trees
     $scope.treeLayer = L.geoJson('', {
+      onEachFeature: function(feature, layer) {
+        layer.on('mouseover', function(e) {
+          var hover_bubble = new L.Rrose({
+              offset: new L.Point(0, -2),
+              closeButton: false
+            })
+            .setContent('<b>plant year: </b>' + String(feature.properties.year) +
+                        '</br><b>common name: </b>' + feature.properties.common_name +
+                        '</br><b>genus: </b>' + feature.properties.genus +
+                        '</br><b>species: </b>' + feature.properties.species)
+            .setLatLng(e.latlng)
+            .openOn($scope.map);
+        });
+        layer.on('mouseout', function(e) {
+          $scope.map.closePopup()
+        });
+      },
       style: function(feature) {
         switch (String(feature.properties.year)) {
           case "2013":
@@ -156,7 +173,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       },
       pointToLayer: function(feature, latlng) {
         return L.circleMarker(latlng, {
-          radius: 8,
+          radius: 10,
           color: 'white',
           weight: .5,
           opacity: 1,
