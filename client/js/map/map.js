@@ -152,9 +152,9 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
             .setLatLng(e.latlng)
             .openOn($scope.map);
         });
-        // layer.on('mouseout', function(e) {
-        //   $scope.map.closePopup()
-        // });
+        layer.on('mouseout', function(e) {
+          $scope.map.closePopup()
+        });
       },
       style: function(feature) {
         switch (String(feature.properties.year)) {
