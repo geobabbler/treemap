@@ -132,7 +132,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     //empty layer for the trees
     $scope.treeLayer = L.geoJson('', {
       onEachFeature: function(feature, layer) {
-        layer.on('mouseover', function(e) {
+        layer.on('mouseover click', function(e) {
           var hover_bubble = new L.Rrose({
               offset: new L.Point(0, -2),
               closeButton: false,
@@ -289,7 +289,8 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       //neighborhood button clicked
       if ($scope.neighborhoodLayerVisible) {
         treeData.showNeighborhoods({
-          bbox: $scope.map.getBounds()
+          bbox: $scope.map.getBounds(),
+          zoomLev: $scope.map.getZoom()
         }).then(function(data) {
           $scope.neighborhoodsLayer.clearLayers();
           $scope.neighborhoodsLayer.addData(data);

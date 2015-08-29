@@ -28,7 +28,9 @@ exports.neighborhoodByBounds = function(req, res, next) {
   var neX = req.query.neLat,
       neY = req.query.neLng,
       swX = req.query.swLat,
-      swY = req.query.swLng;
+      swY = req.query.swLng,
+      zoomLev = req.query.zoomLev;
+
     pg.connect(connstring, function(err, client, done) {
         var handleError = function(err) {
             if(!err) return false;
@@ -38,7 +40,14 @@ exports.neighborhoodByBounds = function(req, res, next) {
 
         };
 
-        var myQuery = 'select label, id, ST_AsGeoJSON(geom) AS geom from neighborhoodwgs84 WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ));'
+        var tolerance = '.001';
+        if(zoomLev > 12){
+          tolerance = '.00005';
+        }
+
+        var myQuery = `SELECT label, id, ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, ${tolerance})) AS geom `+
+                      `FROM neighborhoodwgs84 ` +
+                      `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ));`
 
         client.query(myQuery, function(err, result) {
             if(result.rowCount == 0) {

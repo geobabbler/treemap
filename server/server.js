@@ -16,8 +16,8 @@ console.log('listening on port ' + environment.port)
 
 
 
-/* from right to left:  assigning the app function to module.exports, 
-   which in turn is implicitely assigning it to the exports variable.  
+/* from right to left:  assigning the app function to module.exports,
+   which in turn is implicitely assigning it to the exports variable.
    Now exports = app everywhere.
    More Info:  http://bites.goodeggs.com/posts/export-this/#namespace
 */

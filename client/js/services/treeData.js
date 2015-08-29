@@ -31,12 +31,12 @@ angular.module('treeData',['ngRoute']).factory('treeData', function($http, $q){
 
     this.showNeighborhoods = function(data) {
         var defer = $q.defer();
-
             var swX = data.bbox._southWest.lng,
                 swY = data.bbox._southWest.lat,
                 neX = data.bbox._northEast.lng,
-                neY = data.bbox._northEast.lat;
-        $http.get('/api/neighborhood?neLat=' + String(neY) + '&neLng=' + String(neX)  + '&swLat=' + String(swY)  + '&swLng=' + String(swX))
+                neY = data.bbox._northEast.lat
+                zoomLev = data.zoomLev;
+        $http.get('/api/neighborhood?neLat=' + String(neY) + '&neLng=' + String(neX)  + '&swLat=' + String(swY)  + '&swLng=' + String(swX) + '&zoomLev=' + zoomLev)
           .success(function(outData) {
               defer.resolve(outData);
             })

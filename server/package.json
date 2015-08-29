@@ -9,6 +9,7 @@
     "body-parser":"latest",
     "corser": "latest",
     "diskspace": "latest",
-    "pg": "latest"
+    "pg": "latest",
+    "babel": "latest"
   }
 }
