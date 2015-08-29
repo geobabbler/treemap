@@ -11,10 +11,10 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.neighborhoodLayerVisible = false;
 
     // default map starts for this project TODO: seperate starts into config file
-    $scope.startX = 39.290452,
-      $scope.startY = -76.614090,
+    $scope.startX = 39.2847064,
+      $scope.startY = -76.6204859,
       $scope.startZ = 16;
-    $scope.maxBounds = L.latLngBounds(L.latLng(39.0, -76.7), L.latLng(39.6, -76.4));
+    $scope.maxBounds = L.latLngBounds(L.latLng(39.21789, -76.84456), L.latLng(39.35156, -76.39618));
 
     /*
      * Mapping / Leaflet parts
@@ -89,6 +89,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         $scope.map.zoomIn();
       }
       $scope.map.zoomOut();
+      console.log($scope.map.getBounds());
     });
 
     /*
