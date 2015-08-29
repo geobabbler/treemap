@@ -26,7 +26,7 @@
 <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse" collapse="navCollapsed">
     <ul class="nav navbar-nav">
-      <form class="navbar-form navbar-left" role="search">
+      <form class="navbar-form navbar-left">
         <button ng-click="toggleNeighborhoods();" class="btn btn-default" ng-class="{'active':neighborhoodButton}">
           <span ng-hide="neighborhoodButton">Show Neighborhoods</span>
           <span ng-show="neighborhoodButton">&nbsp;Hide Neighborhoods&nbsp;&nbsp;</span>
@@ -50,22 +50,22 @@
 
     <ul class="nav navbar-nav navbar-right hidden-xs">
       <li>
-        <a href="#" ng-click="baseLayerToggle('satellite')" ng-show="baseMap === 'road'">
+        <a href="#" ng-click="baseLayerToggle('satellite')" ng-show="baseMap === 'road'" tooltip="satellite view" tooltip-trigger="mouseenter" tooltip-placement="bottom" tooltip-append-to-body="true">
           <span class="fa fa-globe fa-fw"></span>
         </a>
       </li>
       <li>
-        <a href="#" ng-click="baseLayerToggle('road')" ng-show="baseMap === 'satellite'">
+        <a href="#" ng-click="baseLayerToggle('road')" ng-show="baseMap === 'satellite'" tooltip="road view" tooltip-trigger="mouseenter" tooltip-placement="bottom" tooltip-append-to-body="true">
           <span class="fa fa-road fa-fw"></span>
         </a>
       </li>
       <li>
-        <a href="#" ng-click="zoomChange('zoomIn')">
+        <a href="#" ng-click="zoomChange('zoomIn')" tooltip="zoom in" tooltip-trigger="mouseenter" tooltip-placement="bottom" tooltip-append-to-body="true">
           <span class="fa fa-plus fa-fw"></span>
         </a>
       </li>
       <li>
-        <a href="#" ng-click="zoomChange('zoomOut')">
+        <a href="#" ng-click="zoomChange('zoomOut')" tooltip="zoom out" tooltip-trigger="mouseenter" tooltip-placement="bottom" tooltip-append-to-body="true">
           <span class="fa fa-minus fa-fw"></span>
         </a>
       </li>
