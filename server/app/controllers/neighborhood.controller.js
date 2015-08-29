@@ -85,7 +85,9 @@ exports.neighborhoodNamesBBox = function(req, res, next) {
                 return true;
             };
 
-            var myQuery = "SELECT label, ST_AsGeoJSON(ST_Envelope(geom)) AS geom FROM neighborhoodwgs84 WHERE LOWER(label) LIKE LOWER('%" + searchString + "%') LIMIT 6;"
+            var myQuery = `SELECT label, ST_AsGeoJSON(ST_Envelope(geom)) AS geom ` +
+                          `FROM neighborhoodwgs84 ` +
+                          `WHERE LOWER(label) LIKE LOWER('%${searchString}%') LIMIT 6;`
             client.query(myQuery, function(err, result) {
                 // console.log(result.rowCount)
                 if(result.rowCount == 0) {

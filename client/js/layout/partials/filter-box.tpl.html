@@ -1,9 +1,9 @@
 <div class="filterbox" ng-mouseenter="showFilters()" ng-mouseleave="hideFilters()">
   <div class="col-md-12" ng-hide="filterOn">
-    {{treeCount}}
-    Trees Visible
+    {{treeCount}} Trees Visible | Filters <i class="fa fa-arrow-circle-o-down"></i>
   </div>
   <div class="col-md-12 col-lg-12" ng-show="filterOn">
+    {{treeCount}} Trees Visible | Filters <i class="fa fa-arrow-circle-o-up"></i>
     <div class="row">
       <table class="table">
         <tbody class="info legend">
@@ -17,9 +17,6 @@
           </tr>
         </tbody>
       </table>
-      <div class="filterbox-subtext"><small> ^ click to hide</small></div>
     </div>
-    {{treeCount}}
-    Trees Visible
   </div>
 </div>

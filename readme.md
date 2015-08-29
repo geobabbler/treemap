@@ -5,9 +5,9 @@ for current example/to see progress, go to http://treemap.hogan.io/
 to deploy:
 
 1. clone this repo down. make sure you have npm install and nodejs on your system
-2. go in to the server repo and `sudo npm install`
-3. go in to the client repo, and `sudo npm install -g bower` then `bower install`
-4. run the server.js file `node server/server.js`
+2. In the project root - `sudo npm install`
+3. go in to the client repo `cd server`, and `sudo npm install -g bower` then `bower install`
+4. go back to the root project leve `cd ..` and run the index.js file `node server/server.js`. This has babel on-the-fly convert the backend files, which some files contain es2015, to es5.
 
 This app is running on a digital ocean 512mb droplet. The node backend is the API and hosts the static front end angular app
 
