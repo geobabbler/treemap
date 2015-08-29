@@ -26,9 +26,13 @@
 <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse" collapse="navCollapsed">
     <ul class="nav navbar-nav">
-      <li>
-        <a ng-click="toggleNeighborhoods();" style="padding-right: 3px;">Show Neighborhoods</a>
-      </li>
+      <form class="navbar-form navbar-left" role="search">
+        <button ng-click="toggleNeighborhoods();" class="btn btn-default" ng-class="{'active':neighborhoodButton}">
+          <span ng-hide="neighborhoodButton">Show Neighborhoods</span>
+          <span ng-show="neighborhoodButton">&nbsp;Hide Neighborhoods&nbsp;&nbsp;</span>
+        </button>
+        <!-- <a ng-click="toggleNeighborhoods();" style="padding-right: 3px;">Show Neighborhoods</a> -->
+      </form>
       <li>
         <form class="navbar-form" role="search">
           <div class="form-group">

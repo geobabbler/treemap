@@ -303,6 +303,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       }
     }
     $scope.toggleNeighborhoods = function() {
+      $scope.neighborhoodButton = !$scope.neighborhoodButton;
       $scope.neighborhoodLayerVisible = !$scope.neighborhoodLayerVisible;
       $scope.neighborhoods();
     }
