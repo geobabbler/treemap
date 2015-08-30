@@ -36,7 +36,6 @@ exports.showTrees = function(req, res, next) {
     swY = req.query.swLng,
     filter = req.query.filter;
 
-  // var bbox = JSON.parse(decodeURIComponent(encodedBBOX));
 
 
   //if the bounding box has three values come in on param...
@@ -50,14 +49,16 @@ exports.showTrees = function(req, res, next) {
       };
 
       // if(!filter){
-      var myQuery = 'SELECT common_nam, genus, species, year, ST_AsGeoJSON(geom) AS geography ' +
-        'FROM tree_plantingswgs84 ' +
-        'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 ))'
+      var myQuery = `SELECT common_nam, genus, species, year, ST_AsGeoJSON(geom) AS geography, count(year) AS total ` +
+                    `FROM tree_plantingswgs84 ` +
+                    `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))`
 
       if (filter) {
-        myQuery += ' and year::int != all (array[' + filter + ']);'
+        myQuery += ` and year::int != all (array[${filter}])`
       }
+      myQuery += ` GROUP BY common_nam, genus, species, year, geom;`
 
+      console.log(myQuery);
       client.query(myQuery, function(err, result) {
         if (result.rowCount == 0) {
           res.send(500);
@@ -70,7 +71,8 @@ exports.showTrees = function(req, res, next) {
               "common_name": result.rows[i].common_nam,
               "genus": result.rows[i].genus,
               "species": result.rows[i].species,
-              "year": parseInt(result.rows[i].year)
+              "year": parseInt(result.rows[i].year),
+              "total": result.rows[i].total
             })
             feature.geometry = JSON.parse(result.rows[i].geography);
             featureCollection.features.push(feature);
@@ -104,10 +106,10 @@ exports.clusterByReducedPrecision = function(req, res, next) {
     };
 
     // if(!filter){
-    var myQuery = 'SELECT count(gid) as total, \'{"type":"Point","coordinates":[\'||round(longitude, ' + precision + ')||\',\'||round(latitude, ' + precision + ')||\']}\' as geography ' +
-      'FROM tree_plantingswgs84 ' +
-      'WHERE ST_Intersects(geom, ST_GeometryFromText (\'POLYGON((' + swY + ' ' + swX + ',' + neY + ' ' + swX + ',' + neY + ' ' + neX + ',' + swY + ' ' + neX + ',' + swY + ' ' + swX + '))\', 4326 )) ' +
-      'GROUP BY round(latitude, ' + precision + '), round(longitude, ' + precision + ');'
+    var myQuery = `SELECT count(gid) as total, '{"type":"Point","coordinates":['||round(longitude, ${precision})||','||round(latitude, ${precision})||']}' as geography ` +
+                  `FROM tree_plantingswgs84 ` +
+                  `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 )) ` +
+                  `GROUP BY round(latitude, ${precision}), round(longitude, ${precision});`
 
     //with neighborhood filter
     // if(filter){

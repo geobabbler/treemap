@@ -129,6 +129,9 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       }
     };
 
+    function pointSize(data){
+      return 8 + data;
+    }
     //empty layer for the trees
     $scope.treeLayer = L.geoJson('', {
       onEachFeature: function(feature, layer) {
@@ -144,10 +147,11 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
                         '</div>' +
                         '<hr>' +
                         '<div class="row">' +
-                          '<b>plant year: </b>' + String(feature.properties.year) +
-                          '</br><b>common name: </b>' + (feature.properties.common_name).replace(/�/g,'') +
-                          '</br><b>genus: </b>' + feature.properties.genus +
-                          '</br><b>species: </b>' + feature.properties.species +
+                          `<b>plant year: </b>${String(feature.properties.year)}</br>`+
+                          `<b>trees here: </b>${String(feature.properties.total)}</br>` +
+                          `<b>common name: </b>${(feature.properties.common_name).replace(/�/g,'')}</br>`  +
+                          `<b>genus: </b>${feature.properties.genus}</br>` +
+                          '<b>species: </b>' + feature.properties.species +
                         '</div>'+
                       '</div>')
             .setLatLng(e.latlng)
@@ -183,7 +187,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       },
       pointToLayer: function(feature, latlng) {
         return L.circleMarker(latlng, {
-          radius: 10,
+          radius: pointSize(parseInt(feature.properties.total)),
           color: 'white',
           weight: .5,
           opacity: 1,
@@ -195,15 +199,18 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     //function to draw the trees
     $scope.drawTrees = function() {
 
-      if ($scope.map.getZoom() >= 16) {
+      if ($scope.map.getZoom() >= 15) {
 
         treeData.showTrees({
           bbox: $scope.map.getBounds(),
           filter: $scope.disabledYearArray
         }).then(function(data) {
-
+          var total = 0;
+          data.features.forEach(function(d){
+            total += parseInt(d.properties.total);
+          });
           $scope.showClusterByReducedPrecisionLayer.clearLayers();
-          $rootScope.$broadcast('treeCount', data.features.length);
+          $rootScope.$broadcast('treeCount', total);
           try {
             $scope.map.removeLayer($scope.markers);
           } catch (err) {
@@ -231,7 +238,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
           //failure!
         });
       }
-      if (($scope.map.getZoom() > 14) && ($scope.map.getZoom() < 16)) {
+      if (($scope.map.getZoom() < 15) && ($scope.map.getZoom() > 12)) {
         treeData.clusterByReducedPrecision({
           precision: 4,
           bbox: $scope.map.getBounds(),
@@ -257,7 +264,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
           //failure!
         });
       }
-      if ($scope.map.getZoom() < 15) {
+      if ($scope.map.getZoom() < 13) {
         treeData.clusterByReducedPrecision({
           precision: 3,
           bbox: $scope.map.getBounds(),

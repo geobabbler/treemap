@@ -1,14 +1,13 @@
 {
   "name": "rrose",
   "homepage": "https://github.com/hoganmaps/rrose",
-  "version": "0.1.0",
-  "_release": "0.1.0",
+  "_release": "a96f748b36",
   "_resolution": {
-    "type": "version",
-    "tag": "v0.1.0",
-    "commit": "1005b27af5e284e73d65fcb9ba9459e8d1fd2fc8"
+    "type": "branch",
+    "branch": "master",
+    "commit": "a96f748b3647863e51b313285b992831bf38d902"
   },
   "_source": "https://github.com/hoganmaps/rrose.git",
-  "_target": "*",
+  "_target": "master",
   "_originalSource": "https://github.com/hoganmaps/rrose.git"
 }
