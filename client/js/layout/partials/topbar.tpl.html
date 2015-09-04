@@ -36,7 +36,7 @@
       <li>
         <form class="navbar-form" role="search">
           <div class="form-group">
-            <input class="form-control" class="form-control" ng-model="neighborhoodNameSelected" placeholder="Filter by Neighborhood" type="text" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="zoomToHood($item)" typeahead="address.properties.label for address in neighborhoodTextInput($viewValue)">
+            <input class="form-control" class="form-control" ng-model="neighborhoodNameSelected" placeholder="Go to Neighborhood" type="text" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="zoomToHood($item)" typeahead="address.properties.label for address in neighborhoodTextInput($viewValue)">
             <i class="glyphicon glyphicon-refresh" ng-show="loadingLocations"></i>
             <div ng-show="noResults">
               <i class="glyphicon glyphicon-remove"></i>
