@@ -48,7 +48,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     /*
       this empty unstyled geojson feeds the clusters
     */
-    $scope.clusteredGeoJSON = L.geoJson('');
+    // $scope.clusteredGeoJSON = L.geoJson('');
 
     $scope.neighborhoodPolyStyle = function(feat) {
       return {
@@ -130,7 +130,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     };
 
     function pointSize(data) {
-      return 8 + data;
+      return 8 + (data / 15);
     }
     //empty layer for the trees
     $scope.treeLayer = L.geoJson('', {
@@ -196,12 +196,88 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       }
     });
 
+    //empty layer for the trees
+    $scope.treeNeighborhoodPoints = L.geoJson('', {
+      onEachFeature: function(feature, layer) {
+        console.log(feature, layer)
+        layer.on('mouseover click', function(e) {
+          var hover_bubble = new L.Rrose({
+              offset: new L.Point(0, -2),
+              closeButton: false,
+              autoPan: false,
+              y_bounds: 149
+            })
+            .setContent(`<div class="row" style="text-align: center;">
+              <i class="fa fa-leaf"></i>
+              </div>
+              <hr>
+              <div class="row">
+              <b>${String(feature.properties.neighborhood)}</b></br>
+              <b>trees here: </b>${String(feature.properties.count)}</br>
+              </div>
+              </div>`)
+            .setLatLng(e.latlng)
+            .openOn($scope.map);
+        });
+        layer.on('mouseout', function(e) {
+          $scope.map.closePopup()
+        });
+      },
+      pointToLayer: function(feature, latlng) {
+        // var chartOptions = {
+        // 'dataPoint1': {
+        //     fillColor: '#FEE5D9',
+        //     minValue: 0,
+        //     maxValue: 20,
+        //     maxHeight: 20,
+        //     displayText: function (value) {
+        //         return value.toFixed(2);
+        //     }
+        // },
+        // 'dataPoint2': {
+        //     fillColor: '#FCAE91',
+        //     minValue: 0,
+        //     maxValue: 20,
+        //     maxHeight: 20,
+        //     displayText: function (value) {
+        //         return value.toFixed(2);
+        //     }
+        // },
+        // 'dataPoint3': {
+        //     fillColor: '#FB6A4A',
+        //     minValue: 0,
+        //     maxValue: 20,
+        //     maxHeight: 20,
+        //     displayText: function (value) {
+        //         return value.toFixed(2);
+        //     }
+        // },
+        // 'dataPoint4': {
+        //     fillColor: '#CB181D',
+        //     minValue: 0,
+        //     maxValue: 20,
+        //     maxHeight: 20,
+        //     displayText: function (value) {
+        //         return value.toFixed(2);
+        //     }
+        // }
+        // };
+        // return new L.PieChartMarker(latlng, chartOptions);
+        return L.circleMarker(latlng, {
+          radius: pointSize(parseInt(feature.properties.count)),
+          color: 'red',
+          weight: .5,
+          opacity: 1,
+          fillOpacity: 0.65
+        });
+      }
+    });
+
     //function to draw the trees
     $scope.drawTrees = function() {
 
       //zoomed in pretty far
       if ($scope.map.getZoom() >= 15) {
-
         treeData.showTrees({
           bbox: $scope.map.getBounds(),
           filter: $scope.disabledYearArray
@@ -210,10 +286,9 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
           data.features.forEach(function(d) {
             total += parseInt(d.properties.total);
           });
-          $scope.showClusterByReducedPrecisionLayer.clearLayers();
           $rootScope.$broadcast('treeCount', total);
           try {
-            $scope.map.removeLayer($scope.markers);
+            $scope.map.removeLayer($scope.treeNeighborhoodPoints);
           } catch (err) {
             //
           }
@@ -240,33 +315,27 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         });
       } else {
         //Mid level zoom/start of backend clustered data
-        var precision;
-        if (($scope.map.getZoom() < 15) && ($scope.map.getZoom() > 13)) {
-          precision = 4;
-        }
-        if ($scope.map.getZoom() <= 13) {
-          precision = 3;
-        }
+        // var precision;
+        // if (($scope.map.getZoom() < 15) && ($scope.map.getZoom() > 13)) {
+        //   precision = 4;
+        // }
+        // if ($scope.map.getZoom() <= 13) {
+        //   precision = 3;
+        // }
         treeData.clusterByReducedPrecision({
-          precision: precision,
           bbox: $scope.map.getBounds(),
           filter: $scope.disabledYearArray
         }).then(function(data) {
           $scope.treeLayer.clearLayers();
           $rootScope.$broadcast('treeCount', data.total);
-
           try {
-            $scope.map.removeLayer($scope.markers);
-            // $scope.map.removeLayer($scope.gridCluster);
-            // $scope.gridCluster.clearAll()
+            $scope.map.removeLayer($scope.treeNeighborhoodPoints);
           } catch (err) {
             //
           }
-          $scope.markers = new L.MarkerClusterGroup({
-            showCoverageOnHover: true,
-            zoomToBoundsOnClick: false,
-            singleMarkerMode: true
-          });
+          $scope.treeNeighborhoodPoints.clearLayers();
+          $scope.treeNeighborhoodPoints.addData(data);
+          $scope.treeNeighborhoodPoints.addTo($scope.map);
 
           for (var item in $scope.treeConfig) {
             $scope.treeConfig[item].count = 0;
@@ -280,20 +349,6 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
               $scope.treeConfig["other"].count += parseInt(data.features[key].properties.count);
             }
           }
-
-          $scope.clusteredGeoJSON.addData(data);
-
-          $scope.markers.addLayer($scope.clusteredGeoJSON);
-          $scope.map.addLayer($scope.markers);
-          // $scope.gridCluster = L.gridCluster({
-          //   gridSize: 0.005,
-          //   // showCentroids: false,
-          //   showGrid: false,
-          //   minFeaturesToCluster: 0
-          // }).addTo($scope.map);
-          //
-          // $scope.clusteredGeoJSON.addData(data);
-          // $scope.gridCluster.addLayers($scope.clusteredGeoJSON);
 
         }, function(err) {
           //failure!
@@ -371,19 +426,19 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         0;
     }
 
-    $scope.showClusterByReducedPrecisionLayer = L.geoJson('', {
-      pointToLayer: function(feature, latlng) {
-        return L.circleMarker(latlng, {
-          radius: getSize(feature.properties.count),
-          fillColor: "#ff7800",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
-        }).addTo($scope.map);
-      }
-    }).addTo($scope.map);
-    $scope.showClusterByReducedPrecision = false;
+    // $scope.showClusterByReducedPrecisionLayer = L.geoJson('', {
+    //   pointToLayer: function(feature, latlng) {
+    //     return L.circleMarker(latlng, {
+    //       radius: getSize(feature.properties.count),
+    //       fillColor: "#ff7800",
+    //       color: "#000",
+    //       weight: 1,
+    //       opacity: 1,
+    //       fillOpacity: 0.8
+    //     }).addTo($scope.map);
+    //   }
+    // }).addTo($scope.map);
+    // $scope.showClusterByReducedPrecision = false;
 
 
     $scope.map.on('moveend', $scope.drawTrees);

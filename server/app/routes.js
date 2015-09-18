@@ -6,7 +6,7 @@ module.exports = function(app) {
   app.get("/api/neighborhood", neighborhoodController.neighborhoodByBounds);
   app.get("/api/neighborhoodNames", neighborhoodController.neighborhoodNamesBBox);
   app.get("/api/geo/trees", geoController.showTrees);
-  app.get("/api/geo/clusterByReducedPrecision/:precision", geoController.clusterByReducedPrecision);
+  app.get("/api/geo/clusterByReducedPrecision", geoController.clusterByReducedPrecision);
 
   app.get("/api/stats/trees", geoController.showTrees);
 };

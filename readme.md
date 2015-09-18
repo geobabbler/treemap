@@ -37,3 +37,19 @@ server {
 
 #### API Endpoints/params/query items
 __coming soon__
+
+
+####database stuff
+first:
+ALTER TABLE tree_plantingswgs84
+ADD COLUMN neighborhoodName character varying(50)
+
+then:
+UPDATE tree_plantingswgs84
+SET neighborhoodName = neighborhoodwgs84.label
+FROM neighborhoodwgs84
+WHERE ST_Intersects(neighborhoodwgs84.geom,tree_plantingswgs84.geom);
+
+SELECT name
+  FROM jacksonco_schools, medford_citylimits
+  WHERE ST_Within(jacksonco_schools.the_geom, medford_citylimits.the_geom);

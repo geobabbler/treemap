@@ -78,7 +78,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       }
     };
 
-    $http.get('/api/geo/clusterByReducedPrecision/' + data.precision + '?neLat=' + String(neY) + '&neLng=' + String(neX) + '&swLat=' + String(swY) + '&swLng=' + String(swX) + '&filter=' + sendFilter)
+    $http.get('/api/geo/clusterByReducedPrecision?neLat=' + String(neY) + '&neLng=' + String(neX) + '&swLat=' + String(swY) + '&swLng=' + String(swX) + '&filter=' + sendFilter)
       .success(function(outData) {
         defer.resolve(outData);
       })

@@ -58,8 +58,9 @@ exports.showTrees = function(req, res, next) {
       }
       myQuery += ` GROUP BY common_nam, genus, species, year, geom;`
 
+      console.log(myQuery)
       client.query(myQuery, function(err, result) {
-        console.log(result);
+
         if (result.rowCount == 0) {
           res.send(500);
         } else {
@@ -90,7 +91,7 @@ exports.showTrees = function(req, res, next) {
 
 /*clustering experiments*/
 exports.clusterByReducedPrecision = function(req, res, next) {
-  var precision = req.params.precision;
+  // var precision = req.params.precision;
   var neX = req.query.neLat,
     neY = req.query.neLng,
     swX = req.query.swLat,
@@ -105,22 +106,27 @@ exports.clusterByReducedPrecision = function(req, res, next) {
       return true;
     };
 
-    // if(!filter){
-    // var myQuery = `SELECT count(gid) as total, '{"type":"Point","coordinates":['||round(longitude, ${precision})||','||round(latitude, ${precision})||']}' as geography, common_nam, genus, species ` +
-    //               `FROM tree_plantingswgs84 ` +
-    //               `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 )) ` +
-    //               `GROUP BY round(latitude, ${precision}), round(longitude, ${precision}), common_nam, genus, species;`
-    var myQuery = `SELECT count(gid) as total, '{"type":"Point","coordinates":['||round(longitude, ${precision})||','||round(latitude, ${precision})||']}' as geography, year::int ` +
-                  `FROM tree_plantingswgs84 ` +
-                  `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))`
 
-    if (filter) {
-      myQuery += ` and year::int != all (array[${filter}])`
-    }
 
-    myQuery += ` GROUP BY round(latitude, ${precision}), round(longitude, ${precision}), year;`
-
-                  console.log(myQuery);
+          var myQuery = `
+            SELECT ST_AsGeoJSON(ST_Centroid(ST_Collect(geom))) AS geography,
+            	neighborhoodname,
+            	count(year) AS total,
+            	sum(case when year::int = 0 then 1 else 0 end) AS unkownyr,
+            	sum(case when year::int = 2008 then 1 else 0 end) AS yr2008,
+            	sum(case when year::int = 2009 then 1 else 0 end) AS yr2009,
+            	sum(case when year::int = 2010 then 1 else 0 end) AS yr2010,
+            	sum(case when year::int = 2011 then 1 else 0 end) AS yr2011,
+            	sum(case when year::int = 2012 then 1 else 0 end) AS yr2012,
+            	sum(case when year::int = 2013 then 1 else 0 end) AS yr2013
+            FROM tree_plantingswgs84
+            WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))
+          `;
+          if (filter) {
+            myQuery += ` and year::int != all (array[${filter}])`
+          }
+          myQuery += ` GROUP BY neighborhoodname`;
+          console.log(myQuery);
     client.query(myQuery, function(err, result) {
       var totalTrees = 0;
       if (result.rowCount == 0) {
@@ -132,8 +138,15 @@ exports.clusterByReducedPrecision = function(req, res, next) {
           var feature = new Feature();
           //feature.properties = ({"city_name":result.rows[i].city_name, "cntry_name":result.rows[i].cntry_name, "pop":result.rows[i].pop});
           feature.properties = ({
-            "count": result.rows[i].total,
-            "year": result.rows[i].year
+            "count": parseInt(result.rows[i].total),
+            "neighborhood": result.rows[i].neighborhoodname,
+            "YRunkown": parseInt(result.rows[i].unkownyr),
+            "YR2008": parseInt(result.rows[i].yr2008),
+            "YR2009": parseInt(result.rows[i].yr2009),
+            "YR2010": parseInt(result.rows[i].yr2010),
+            "YR2011": parseInt(result.rows[i].yr2011),
+            "YR2012": parseInt(result.rows[i].yr2012),
+            "YR2013": parseInt(result.rows[i].yr2013)
           })
           feature.geometry = JSON.parse(result.rows[i].geography);
           featureCollection.features.push(feature);
