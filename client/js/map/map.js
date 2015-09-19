@@ -89,7 +89,6 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         $scope.map.zoomIn();
       }
       $scope.map.zoomOut();
-      console.log($scope.map.getBounds());
     });
 
     /*
@@ -196,82 +195,190 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       }
     });
 
+    // //empty layer for the trees
+    // $scope.treeNeighborhoodPoints = L.geoJson('', {
+    //   onEachFeature: function(feature, layer) {
+    //     console.log(feature, layer)
+    //     layer.on('mouseover click', function(e) {
+    //       var hover_bubble = new L.Rrose({
+    //           offset: new L.Point(0, -2),
+    //           closeButton: false,
+    //           autoPan: false,
+    //           y_bounds: 149
+    //         })
+    //         .setContent(`<div class="row" style="text-align: center;">
+    //           <i class="fa fa-leaf"></i>
+    //           </div>
+    //           <hr>
+    //           <div class="row">
+    //           <b>${String(feature.properties.neighborhood)}</b></br>
+    //           <b>trees here: </b>${String(feature.properties.count)}</br>
+    //           </div>
+    //           </div>`)
+    //         .setLatLng(e.latlng)
+    //         .openOn($scope.map);
+    //     });
+    //     layer.on('mouseout', function(e) {
+    //       $scope.map.closePopup()
+    //     });
+    //   },
+    //   pointToLayer: function(feature, latlng) {
+    //
+    //     // return new L.PieChartMarker(latlng, chartOptions);
+    //     // return L.circleMarker(latlng, {
+    //     //   radius: pointSize(parseInt(feature.properties.count)),
+    //     //   color: 'red',
+    //     //   weight: .5,
+    //     //   opacity: 1,
+    //     //   fillOpacity: 0.65
+    //     // });
+    //     console.log(latlng);
+    //     console.log(feature);
+    //     return L.PieChartMarker(latlng, {
+    //       data: {
+    //         'unknown': feature.properties.YRunkown,
+    //         '2008': feature.properties.YR2008,
+    //         '2009': feature.properties.YR2009,
+    //         '2010': feature.properties.YR2010,
+    //         '2011': feature.properties.YR2011,
+    //         '2012': feature.properties.YR2012,
+    //         '2013': feature.properties.YR2013
+    //       },
+    //       chartOptions: {
+    //         'unknown': {
+    //           fillColor: '#FEE5D9',
+    //           color: '#FEE5D9'
+    //         },
+    //         '2008': {
+    //           fillColor: '#FCAE91',
+    //           color: '#FEE5D9'
+    //         },
+    //         '2009': {
+    //           fillColor: '#FB6A4A',
+    //           color: '#FEE5D9'
+    //         },
+    //         '2010': {
+    //           fillColor: '#CB181D',
+    //           color: '#FEE5D9'
+    //         },
+    //         '2011': {
+    //           fillColor: '#FEE5D9',
+    //           color: '#FEE5D9'
+    //         },
+    //         '2012': {
+    //           fillColor: '#FEE5D9',
+    //           color: '#FEE5D9'
+    //         },
+    //         '2013': {
+    //           fillColor: '#FEE5D9',
+    //           color: '#FEE5D9'
+    //         }
+    //       },
+    //       weight: 1
+    //     });
+    //   }
+    // });  //empty layer for the trees
+    function groupingSize(count){
+      return count > 300  ? 35 :
+           count > 200  ? 30 :
+           count > 100  ? 25 :
+           count > 50   ? 20 :
+           count > 10   ? 15 :
+                      10;
+    }
+
     //empty layer for the trees
-    $scope.treeNeighborhoodPoints = L.geoJson('', {
-      onEachFeature: function(feature, layer) {
-        console.log(feature, layer)
-        layer.on('mouseover click', function(e) {
-          var hover_bubble = new L.Rrose({
-              offset: new L.Point(0, -2),
-              closeButton: false,
-              autoPan: false,
-              y_bounds: 149
-            })
-            .setContent(`<div class="row" style="text-align: center;">
-              <i class="fa fa-leaf"></i>
-              </div>
-              <hr>
-              <div class="row">
-              <b>${String(feature.properties.neighborhood)}</b></br>
-              <b>trees here: </b>${String(feature.properties.count)}</br>
-              </div>
-              </div>`)
-            .setLatLng(e.latlng)
-            .openOn($scope.map);
-        });
-        layer.on('mouseout', function(e) {
-          $scope.map.closePopup()
-        });
-      },
-      pointToLayer: function(feature, latlng) {
-        // var chartOptions = {
-        // 'dataPoint1': {
-        //     fillColor: '#FEE5D9',
-        //     minValue: 0,
-        //     maxValue: 20,
-        //     maxHeight: 20,
-        //     displayText: function (value) {
-        //         return value.toFixed(2);
-        //     }
-        // },
-        // 'dataPoint2': {
-        //     fillColor: '#FCAE91',
-        //     minValue: 0,
-        //     maxValue: 20,
-        //     maxHeight: 20,
-        //     displayText: function (value) {
-        //         return value.toFixed(2);
-        //     }
-        // },
-        // 'dataPoint3': {
-        //     fillColor: '#FB6A4A',
-        //     minValue: 0,
-        //     maxValue: 20,
-        //     maxHeight: 20,
-        //     displayText: function (value) {
-        //         return value.toFixed(2);
-        //     }
-        // },
-        // 'dataPoint4': {
-        //     fillColor: '#CB181D',
-        //     minValue: 0,
-        //     maxValue: 20,
-        //     maxHeight: 20,
-        //     displayText: function (value) {
-        //         return value.toFixed(2);
-        //     }
-        // }
-        // };
-        // return new L.PieChartMarker(latlng, chartOptions);
-        return L.circleMarker(latlng, {
-          radius: pointSize(parseInt(feature.properties.count)),
-          color: 'red',
-          weight: .5,
-          opacity: 1,
-          fillOpacity: 0.65
-        });
-      }
+$scope.treeNeighborhoodPoints = L.geoJson('', {
+  onEachFeature: function(feature, layer) {
+    layer.on('mouseover click', function(e) {
+      var hover_bubble = new L.Rrose({
+          offset: new L.Point(0, -2),
+          closeButton: false,
+          autoPan: false,
+          y_bounds: 149
+        })
+        .setContent(`<div class="row" style="text-align: center;">
+          <i class="fa fa-leaf"></i>
+          </div>
+          <hr>
+          <div class="row">
+          <b>${String(feature.properties.neighborhood)}</b></br>
+          <b>trees here: </b>${String(feature.properties.count)}</br>
+          </div>
+          </div>`)
+        .setLatLng(e.latlng)
+        .openOn($scope.map);
     });
+    layer.on('mouseout', function(e) {
+      $scope.map.closePopup()
+    });
+  },
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, {
+      radius: groupingSize(feature.properties.count),
+      color: 'red',
+      weight: .5,
+      opacity: 1,
+      fillOpacity: 0.65
+    });
+  }
+});
+var layerGroup = new L.layerGroup();
+      $scope.treeNeighborhoodPie = function(data){
+        layerGroup.clearLayers()
+
+        for (var a in data.features) {
+          layerGroup.addLayer(new L.PieChartMarker(L.latLng(data.features[a].geometry.coordinates[1], data.features[a].geometry.coordinates[0]), {
+            data: {
+              'unknown': data.features[a].properties.YRunkown,
+              '2008': data.features[a].properties.YR2008,
+              '2009': data.features[a].properties.YR2009,
+              '2010': data.features[a].properties.YR2010,
+              '2011': data.features[a].properties.YR2011,
+              '2012': data.features[a].properties.YR2012,
+              '2013': data.features[a].properties.YR2013
+            },
+            chartOptions: {
+              'unknown': {
+                fillColor: '#FEE5D9',
+                color: '#FEE5D9'
+              },
+              '2008': {
+                fillColor: '#FCAE91',
+                color: '#FEE5D9'
+              },
+              '2009': {
+                fillColor: '#FB6A4A',
+                color: '#FEE5D9'
+              },
+              '2010': {
+                fillColor: '#CB181D',
+                color: '#FEE5D9'
+              },
+              '2011': {
+                fillColor: '#FEE5D9',
+                color: '#FEE5D9'
+              },
+              '2012': {
+                fillColor: '#FEE5D9',
+                color: '#FEE5D9'
+              },
+              '2013': {
+                fillColor: '#FEE5D9',
+                color: '#FEE5D9'
+              }
+            },
+            fill: true,
+            weight: 1,
+            fillOpacity: 1,
+            radius: groupingSize(data.features[a].properties.count) + 10,
+            barThickness: 10,
+            displayText: data.features[a].properties.count
+          })
+        ).addTo($scope.map);
+
+        }
+      };
 
     //function to draw the trees
     $scope.drawTrees = function() {
@@ -333,6 +440,8 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
           } catch (err) {
             //
           }
+
+          $scope.treeNeighborhoodPie(data);
           $scope.treeNeighborhoodPoints.clearLayers();
           $scope.treeNeighborhoodPoints.addData(data);
           $scope.treeNeighborhoodPoints.addTo($scope.map);
