@@ -395,6 +395,7 @@ var layerGroup = new L.layerGroup();
           });
           $rootScope.$broadcast('treeCount', total);
           try {
+            layerGroup.clearLayers()
             $scope.map.removeLayer($scope.treeNeighborhoodPoints);
           } catch (err) {
             //
