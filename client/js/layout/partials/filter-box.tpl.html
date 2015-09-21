@@ -9,7 +9,7 @@
         <tbody class="info legend">
           <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig | orderObjectBy:'order'" ng-click="toggleTreeYear(year.label)">
             <td>
-              <i style="background:{{year.color}}"></i>
+              <i style="background:{{year.color}}; border: 2px solid black;"></i>
             </td>
             <td>{{year.label}}
               <b>({{year.count}})</b>

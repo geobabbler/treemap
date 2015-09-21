@@ -99,31 +99,31 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       "other": {
         "order": 1,
         "label": "Before 2010",
-        "color": "#feb24c",
+        "color": "#edf8fb",
         "count": 0
       },
       "2010": {
         "order": 2,
         "label": "2010",
-        "color": "#fd8d3c",
+        "color": "#b2e2e2",
         "count": 0
       },
       "2011": {
         "order": 3,
         "label": "2011",
-        "color": "#fc4e2a",
+        "color": "#66c2a4",
         "count": 0
       },
       "2012": {
         "order": 4,
         "label": "2012",
-        "color": "#e31a1c",
+        "color": "#2ca25f",
         "count": 0
       },
       "2013": {
         "order": 5,
         "label": "2013",
-        "color": "#b10026",
+        "color": "#006d2c",
         "count": 0
       }
     };
@@ -187,104 +187,20 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       pointToLayer: function(feature, latlng) {
         return L.circleMarker(latlng, {
           radius: pointSize(parseInt(feature.properties.total)),
-          color: 'white',
-          weight: .5,
+          color: 'black',
+          weight: 2,
           opacity: 1,
           fillOpacity: 0.65
         })
       }
     });
 
-    // //empty layer for the trees
-    // $scope.treeNeighborhoodPoints = L.geoJson('', {
-    //   onEachFeature: function(feature, layer) {
-    //     console.log(feature, layer)
-    //     layer.on('mouseover click', function(e) {
-    //       var hover_bubble = new L.Rrose({
-    //           offset: new L.Point(0, -2),
-    //           closeButton: false,
-    //           autoPan: false,
-    //           y_bounds: 149
-    //         })
-    //         .setContent(`<div class="row" style="text-align: center;">
-    //           <i class="fa fa-leaf"></i>
-    //           </div>
-    //           <hr>
-    //           <div class="row">
-    //           <b>${String(feature.properties.neighborhood)}</b></br>
-    //           <b>trees here: </b>${String(feature.properties.count)}</br>
-    //           </div>
-    //           </div>`)
-    //         .setLatLng(e.latlng)
-    //         .openOn($scope.map);
-    //     });
-    //     layer.on('mouseout', function(e) {
-    //       $scope.map.closePopup()
-    //     });
-    //   },
-    //   pointToLayer: function(feature, latlng) {
-    //
-    //     // return new L.PieChartMarker(latlng, chartOptions);
-    //     // return L.circleMarker(latlng, {
-    //     //   radius: pointSize(parseInt(feature.properties.count)),
-    //     //   color: 'red',
-    //     //   weight: .5,
-    //     //   opacity: 1,
-    //     //   fillOpacity: 0.65
-    //     // });
-    //     console.log(latlng);
-    //     console.log(feature);
-    //     return L.PieChartMarker(latlng, {
-    //       data: {
-    //         'unknown': feature.properties.YRunkown,
-    //         '2008': feature.properties.YR2008,
-    //         '2009': feature.properties.YR2009,
-    //         '2010': feature.properties.YR2010,
-    //         '2011': feature.properties.YR2011,
-    //         '2012': feature.properties.YR2012,
-    //         '2013': feature.properties.YR2013
-    //       },
-    //       chartOptions: {
-    //         'unknown': {
-    //           fillColor: '#FEE5D9',
-    //           color: '#FEE5D9'
-    //         },
-    //         '2008': {
-    //           fillColor: '#FCAE91',
-    //           color: '#FEE5D9'
-    //         },
-    //         '2009': {
-    //           fillColor: '#FB6A4A',
-    //           color: '#FEE5D9'
-    //         },
-    //         '2010': {
-    //           fillColor: '#CB181D',
-    //           color: '#FEE5D9'
-    //         },
-    //         '2011': {
-    //           fillColor: '#FEE5D9',
-    //           color: '#FEE5D9'
-    //         },
-    //         '2012': {
-    //           fillColor: '#FEE5D9',
-    //           color: '#FEE5D9'
-    //         },
-    //         '2013': {
-    //           fillColor: '#FEE5D9',
-    //           color: '#FEE5D9'
-    //         }
-    //       },
-    //       weight: 1
-    //     });
-    //   }
-    // });  //empty layer for the trees
     function groupingSize(count){
-      return count > 300  ? 35 :
-           count > 200  ? 30 :
-           count > 100  ? 25 :
-           count > 50   ? 20 :
-           count > 10   ? 15 :
-                      10;
+      return count > 200  ? 22 :
+           count > 100  ? 18 :
+           count > 50   ? 14 :
+           count > 10   ? 10 :
+                      6;
     }
 
     //empty layer for the trees
@@ -316,7 +232,7 @@ $scope.treeNeighborhoodPoints = L.geoJson('', {
   pointToLayer: function(feature, latlng) {
     return L.circleMarker(latlng, {
       radius: groupingSize(feature.properties.count),
-      color: 'red',
+      color: '#66c2a4',
       weight: .5,
       opacity: 1,
       fillOpacity: 0.65
@@ -330,50 +246,44 @@ var layerGroup = new L.layerGroup();
         for (var a in data.features) {
           layerGroup.addLayer(new L.PieChartMarker(L.latLng(data.features[a].geometry.coordinates[1], data.features[a].geometry.coordinates[0]), {
             data: {
-              'unknown': data.features[a].properties.YRunkown,
-              '2008': data.features[a].properties.YR2008,
-              '2009': data.features[a].properties.YR2009,
+              'Before 2010': (data.features[a].properties.YRunkown + data.features[a].properties.YR2008 + data.features[a].properties.YR2009),
               '2010': data.features[a].properties.YR2010,
               '2011': data.features[a].properties.YR2011,
               '2012': data.features[a].properties.YR2012,
               '2013': data.features[a].properties.YR2013
             },
             chartOptions: {
-              'unknown': {
-                fillColor: '#FEE5D9',
-                color: '#FEE5D9'
-              },
-              '2008': {
-                fillColor: '#FCAE91',
-                color: '#FEE5D9'
-              },
-              '2009': {
-                fillColor: '#FB6A4A',
-                color: '#FEE5D9'
+              'Before 2010': {
+                fillColor: $scope.treeConfig["other"].color,
+                color: 'black'
               },
               '2010': {
-                fillColor: '#CB181D',
-                color: '#FEE5D9'
+                fillColor: $scope.treeConfig["2010"].color,
+                color: 'black'
               },
               '2011': {
-                fillColor: '#FEE5D9',
-                color: '#FEE5D9'
+                fillColor: $scope.treeConfig["2011"].color,
+                color: 'black'
               },
               '2012': {
-                fillColor: '#FEE5D9',
-                color: '#FEE5D9'
+                fillColor: $scope.treeConfig["2012"].color,
+                color: 'black'
               },
               '2013': {
-                fillColor: '#FEE5D9',
-                color: '#FEE5D9'
+                fillColor: $scope.treeConfig["2013"].color,
+                color: 'black'
               }
             },
             fill: true,
-            weight: 1,
+            weight: .5,
             fillOpacity: 1,
-            radius: groupingSize(data.features[a].properties.count) + 10,
-            barThickness: 10,
-            displayText: data.features[a].properties.count
+            radius: groupingSize(data.features[a].properties.count) + 5,
+            barThickness: 5,
+            gradient: false,
+            highlight: false,
+            tooltipOptions: {
+              showTooltips: false
+            }
           })
         ).addTo($scope.map);
 
@@ -451,13 +361,13 @@ var layerGroup = new L.layerGroup();
             $scope.treeConfig[item].count = 0;
           };
           for (var key in data.features) {
+            //other (unkown, 2008, 2009)
+            $scope.treeConfig['other'].count += (data.features[key].properties.YRunkown + data.features[key].properties.YR2008 + data.features[key].properties.YR2009)
 
-            if ($scope.treeConfig[data.features[key].properties.year]) {
-              $scope.treeConfig[data.features[key].properties.year].count += parseInt(data.features[key].properties.count);
-            }
-            if (!$scope.treeConfig[data.features[key].properties.year]) {
-              $scope.treeConfig["other"].count += parseInt(data.features[key].properties.count);
-            }
+            $scope.treeConfig['2010'].count += data.features[key].properties.YR2010
+            $scope.treeConfig['2011'].count += data.features[key].properties.YR2011
+            $scope.treeConfig['2012'].count += data.features[key].properties.YR2012
+            $scope.treeConfig['2013'].count += data.features[key].properties.YR2013
           }
 
         }, function(err) {

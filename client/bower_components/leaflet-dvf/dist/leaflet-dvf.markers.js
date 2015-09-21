@@ -8,12 +8,12 @@ L.LinearFunction = L.Class.extend({
 	options: {
 		constrainX: false
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		this.setOptions(options);
 		this.setRange(minPoint, maxPoint);
 	},
-	
+
 	_calculateParameters: function (minPoint, maxPoint) {
 		if (this._xRange === 0) {
 			this._slope = 0;
@@ -24,67 +24,67 @@ L.LinearFunction = L.Class.extend({
 			this._b = minPoint.y - this._slope * minPoint.x;
 		}
 	},
-	
+
 	_arrayToPoint: function (array) {
 		return {
 			x: array[0],
 			y: array[1]
 		};
 	},
-	
+
 	setOptions: function (options) {
 		L.Util.setOptions(this, options);
-		
+
 		this._preProcess = this.options.preProcess;
 		this._postProcess = this.options.postProcess;
 	},
-	
+
 	getBounds: function () {
 		var minX = Math.min(this._minPoint.x, this._maxPoint.x);
 		var maxX = Math.max(this._minPoint.x, this._maxPoint.x);
 		var minY = Math.min(this._minPoint.y, this._maxPoint.y);
 		var maxY = Math.max(this._minPoint.y, this._maxPoint.y);
-		
+
 		return [new L.Point(minX, minY), new L.Point(maxX, maxY)];
 	},
-	
+
 	setRange: function (minPoint, maxPoint) {
 		minPoint = minPoint instanceof Array ? this._arrayToPoint(minPoint) : minPoint;
 		maxPoint = maxPoint instanceof Array ? this._arrayToPoint(maxPoint) : maxPoint;
-		
+
 		this._minPoint = minPoint;
 		this._maxPoint = maxPoint;
 		this._xRange = maxPoint.x - minPoint.x;
-		
+
 		this._calculateParameters(minPoint, maxPoint);
-		
+
 		return this;
 	},
-	
+
 	setMin: function (point) {
 		this.setRange(point, this._maxPoint);
-		
+
 		return this;
 	},
-	
+
 	setMax: function (point) {
 		this.setRange(this._minPoint, point);
-		
+
 		return this;
 	},
-	
+
 	setPreProcess: function (preProcess) {
 		this._preProcess = preProcess;
-		
+
 		return this;
 	},
-	
+
 	setPostProcess: function (postProcess) {
 		this._postProcess = postProcess;
-		
+
 		return this;
 	},
-	
+
 	constrainX: function (x) {
 		x = Number(x);
 
@@ -92,80 +92,80 @@ L.LinearFunction = L.Class.extend({
 			x = Math.max(x, this._minPoint.x);
 			x = Math.min(x, this._maxPoint.x);
 		}
-		
+
 		return x;
 	},
-	
+
 	evaluate: function (x) {
 		var y;
-		
+
 		if (this._preProcess) {
 			x = this._preProcess(x);
 		}
-		
+
 		// Call toFixed to ensure that both numbers being added are using the same precision
 		y = Number((this._slope * x).toFixed(6)) + Number(this._b.toFixed(6));
-		
+
 		if (this._postProcess) {
 			y = this._postProcess(y);
 		}
-		
+
 		return y;
 	},
-	
+
 	random: function () {
 		var randomX = Math.random() * this._xRange + this._minPoint.x;
-		
+
 		return this.evaluate(randomX);
 	},
-	
+
 	sample: function (count) {
 		count = Math.max(count, 2);
-		
+
 		var segmentCount = count - 1;
 		var segmentSize = this._xRange / segmentCount;
 		var x = this._minPoint.x;
 		var yValues = [];
-		
+
 		while (x <= this._maxPoint.x) {
 			yValues.push(this.evaluate(x));
-			
-			x += segmentSize;	
+
+			x += segmentSize;
 		}
-		
+
 		return yValues;
 	},
-	
+
 	samplePoints: function (count) {
 		count = Math.max(count, 2);
-		
+
 		var segmentCount = count - 1;
 		var segmentSize = this._xRange / segmentCount;
 		var x = this._minPoint.x;
 		var points = [];
-		
+
 		while (x <= this._maxPoint.x) {
 			points.push(new L.Point(x, this.evaluate(x)));
-			
-			x += segmentSize;	
+
+			x += segmentSize;
 		}
-		
+
 		return points;
 	},
-	
+
 	getIntersectionPoint: function (otherFunction) {
 		var point = null;
-		
+
 		if (this._slope !== otherFunction._slope) {
 			var x = (this._b - otherFunction._b)/(otherFunction._slope - this._slope);
 			var y = this.evaluate(x);
-			
+
 			point = new L.Point(x, y);
 		}
-		
+
 		return point;
 	}
-	
+
 });
 
 /*
@@ -176,74 +176,74 @@ L.ColorFunction = L.LinearFunction.extend({
 		alpha: 1.0,
 		includeAlpha: false
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		L.Util.setOptions(this, options);
-		
+
 		// Order of output parts (e.g., ['r','g','b'])
 		this._parts = [];
-	
+
 		// Part of the output that's dynamic (e.g. 'r')
 		this._dynamicPart = null;
 		this._outputPrecision = 0;
-	
+
 		// Output prefix (e.g. rgb, hsl, etc.)
 		this._prefix = null;
-	
+
 		// Override this as necessary
 		this._formatOutput = function (y) {
 			return y.toFixed(this._outputPrecision);
 		};
-	
+
 		this._mapOutput = function (parts) {
 			var outputParts = [];
-		
+
 			for (var i = 0; i < this._parts.length; ++i) {
 				var part = this._parts[i];
 				outputParts.push(parts[part]);
 			}
-		
+
 			if (this.options.includeAlpha) {
 				outputParts.push(this.options.alpha);
 			}
-		
+
 			return outputParts;
 		};
-	
-		this._getColorString = function (y) {		
+
+		this._getColorString = function (y) {
 			y = this._formatOutput(y);
-		
+
 			this.options[this._dynamicPart] = y;
-		
+
 			var parts = this._mapOutput(this.options);
-		
+
 			return this._writeColor(this._prefix, parts);
 		};
-	
+
 		this._writeColor = function (prefix, parts) {
 			if (this.options.includeAlpha) {
 				prefix += 'a';
 			}
-		
+
 			return prefix + '(' + parts.join(',') + ')';
 		};
-		
+
 		options = this.options;
 
 		var postProcess = function (y) {
 			if (options && options.postProcess) {
 				y = options.postProcess.call(this, y);
 			}
-			
+
 			var colorString = this._getColorString(y);
-			
+
 			if (((L.Browser.ie) && colorString.indexOf('hsl') > -1) || options.rgb) {
 				colorString = L.hslColor(colorString).toRGBString();
 			}
-			
+
 			return colorString;
 		};
-		
+
 		L.LinearFunction.prototype.initialize.call(this, minPoint, maxPoint, {
 			preProcess: this.options.preProcess,
 			postProcess: postProcess
@@ -264,7 +264,7 @@ L.HSLColorFunction = L.ColorFunction.extend({
 L.RGBColorFunction = L.ColorFunction.extend({
 	initialize: function (minPoint, maxPoint, options) {
 		L.ColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._parts = ['outputRed', 'outputBlue', 'outputGreen'];
 		this._prefix = 'rgb';
 		this._outputPrecision = 0;
@@ -272,49 +272,49 @@ L.RGBColorFunction = L.ColorFunction.extend({
 });
 
 L.RGBRedFunction = L.LinearFunction.extend({
-	
+
 	options: {
 		outputGreen: 0,
 		outputBlue: 0
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		L.RGBColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._dynamicPart = 'outputRed';
 	}
 });
 
 /*
- * 
+ *
  */
 L.RGBBlueFunction = L.LinearFunction.extend({
-	
+
 	options: {
 		outputRed: 0,
 		outputGreen: 0
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		L.RGBColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._dynamicPart = 'outputBlue';
 	}
 });
 
 /*
- * 
+ *
  */
 L.RGBGreenFunction = L.LinearFunction.extend({
-	
+
 	options: {
 		outputRed: 0,
 		outputBlue: 0
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		L.RGBColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._dynamicPart = 'outputGreen';
 	}
 });
@@ -332,26 +332,26 @@ L.RGBColorBlendFunction = L.LinearFunction.extend({
 		var green2 = rgbMaxColor.g();
 		var blue1 = rgbMinColor.b();
 		var blue2 = rgbMaxColor.b();
-		
+
 		this._minX = minX;
 		this._maxX = maxX;
-		
+
 		this._redFunction = new L.LinearFunction(new L.Point(minX, red1), new L.Point(maxX, red2));
 		this._greenFunction = new L.LinearFunction(new L.Point(minX, green1), new L.Point(maxX, green2));
 		this._blueFunction = new L.LinearFunction(new L.Point(minX, blue1), new L.Point(maxX, blue2));
 	},
-	
+
 	getBounds: function () {
 		var redBounds = this._redFunction.getBounds();
 		var greenBounds = this._greenFunction.getBounds();
 		var blueBounds = this._blueFunction.getBounds();
-		
+
 		var minY = Math.min(redBounds[0].y, greenBounds[0].y, blueBounds[0].y);
 		var maxY = Math.max(redBounds[0].y, greenBounds[0].y, blueBounds[0].y);
-		
+
 		return [new L.Point(redBounds[0].x, minY), new L.Point(redBounds[1].x, maxY)];
 	},
-	
+
 	evaluate: function (x) {
 		return new L.RGBColor([this._redFunction.evaluate(x), this._greenFunction.evaluate(x), this._blueFunction.evaluate(x)]).toRGBString();
 	}
@@ -363,7 +363,7 @@ L.RGBColorBlendFunction = L.LinearFunction.extend({
  * Class for varying the hue linearly and producing an HSL color value
  */
 L.HSLHueFunction = L.HSLColorFunction.extend({
-	
+
 	options: {
 		outputSaturation: '100%',
 		outputLuminosity: '50%'
@@ -371,7 +371,7 @@ L.HSLHueFunction = L.HSLColorFunction.extend({
 
 	initialize: function (minPoint, maxPoint, options) {
 		L.HSLColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._dynamicPart = 'outputHue';
 	}
 });
@@ -380,19 +380,19 @@ L.HSLHueFunction = L.HSLColorFunction.extend({
  * Class for varying the saturation linearly and producing an HSL color value
  */
 L.HSLSaturationFunction = L.LinearFunction.extend({
-	
+
 	options: {
 		outputHue: 0,
 		outputLuminosity: '50%'
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		L.HSLColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._formatOutput = function (y) {
 			return (y * 100).toFixed(this._outputPrecision) + '%';
 		};
-		
+
 		this._dynamicPart = 'outputSaturation';
 	}
 });
@@ -401,19 +401,19 @@ L.HSLSaturationFunction = L.LinearFunction.extend({
  * Class for varying the luminosity linearly and producing an HSL color value
  */
 L.HSLLuminosityFunction = L.LinearFunction.extend({
-	
+
 	options: {
 		outputHue: 0,
 		outputSaturation: '100%'
 	},
-	
+
 	initialize: function (minPoint, maxPoint, options) {
 		L.HSLColorFunction.prototype.initialize.call(this, minPoint, maxPoint, options);
-		
+
 		this._formatOutput = function (y) {
 			return (y * 100).toFixed(this._outputPrecision) + '%';
 		};
-		
+
 		this._dynamicPart = 'outputLuminosity';
 	}
 });
@@ -431,26 +431,26 @@ L.HSLColorBlendFunction = L.LinearFunction.extend({
 		var s2 = hslMaxColor.s();
 		var l1 = hslMinColor.l();
 		var l2 = hslMaxColor.l();
-		
+
 		this._minX = minX;
 		this._maxX = maxX;
-		
+
 		this._hueFunction = new L.LinearFunction(new L.Point(minX, h1), new L.Point(maxX, h2));
 		this._saturationFunction = new L.LinearFunction(new L.Point(minX, s1), new L.Point(maxX, s2));
 		this._luminosityFunction = new L.LinearFunction(new L.Point(minX, l1), new L.Point(maxX, l2));
 	},
-	
+
 	getBounds: function () {
 		var hBounds = this._hueFunction.getBounds();
 		var sBounds = this._saturationFunction.getBounds();
 		var lBounds = this._luminosityFunction.getBounds();
-		
+
 		var minY = Math.min(hBounds[0].y, sBounds[0].y, lBounds[0].y);
 		var maxY = Math.max(hBounds[0].y, sBounds[0].y, lBounds[0].y);
-		
+
 		return [new L.Point(hBounds[0].x, minY), new L.Point(hBounds[1].x, maxY)];
 	},
-	
+
 	evaluate: function (x) {
 		return new L.HSLColor([this._hueFunction.evaluate(x), this._saturationFunction.evaluate(x), this._luminosityFunction.evaluate(x)]).toHSLString();
 	}
@@ -463,31 +463,31 @@ L.PiecewiseFunction = L.LinearFunction.extend({
 	options: {
 		constrainX: true
 	},
-	
+
 	initialize: function (functions, options) {
-		
+
 		L.Util.setOptions(this, options);
-		
+
 		this._functions = functions;
-		
+
 		var startPoint;
 		var endPoint;
-		
+
 		startPoint = functions[0].getBounds()[0];
 		endPoint = functions[functions.length - 1].getBounds()[1];
-		
+
 		L.LinearFunction.prototype.initialize.call(this, startPoint, endPoint, {
 			preProcess: this.options.preProcess,
 			postProcess: this.options.postProcess
 		});
 	},
-	
+
 	_getFunction: function (x) {
 		var bounds;
 		var startPoint;
 		var endPoint;
 		var currentFunction;
-		
+
 		if (x < this._minPoint.x) {
 			currentFunction = this._functions[0];
 		}
@@ -498,10 +498,10 @@ L.PiecewiseFunction = L.LinearFunction.extend({
 			for (var index = 0; index < this._functions.length; ++index) {
 				currentFunction = this._functions[index];
 				bounds = currentFunction.getBounds();
-				
+
 				startPoint = bounds[0];
 				endPoint = bounds[1];
-				
+
 				if (x >= startPoint.x && x < endPoint.x) {
 					break;
 				}
@@ -510,27 +510,27 @@ L.PiecewiseFunction = L.LinearFunction.extend({
 
 		return currentFunction;
 	},
-	
+
 	evaluate: function (x) {
 		var currentFunction;
 		var y = null;
-		
+
 		x = this.constrainX(x);
-		
+
 		if (this._preProcess) {
 			x = this._preProcess(x);
 		}
-		
+
 		currentFunction = this._getFunction(x);
-		
+
 		if (currentFunction) {
 			y = currentFunction.evaluate(x);
-			
+
 			if (this._postProcess) {
 				y = this._postProcess(y);
 			}
 		}
-		
+
 		return y;
 	}
 });
@@ -542,24 +542,24 @@ L.ColorClassFunction = L.PiecewiseFunction.extend({
 	options: {
 		interpolate: false
 	},
-	
+
 	initialize: function (classBreaks, colors, options) {
 		var functions = [];
 		var colorFunction;
-		
+
 		L.Util.setOptions(this, options);
-		
+
 		for (var i = 0; i < classBreaks.length - 1; ++i) {
 			var start = classBreaks[i],
 				end = classBreaks[i + 1],
 				startColor = colors[i],
 				endColor = this.options.interpolate ? colors[Math.min(colors.length -1, i + 1)] : colors[i];
-			
+
 			colorFunction = new L.RGBColorBlendFunction(start, end, startColor, endColor);
-			
-			functions.push(colorFunction);	
+
+			functions.push(colorFunction);
 		}
-		
+
 		L.PiecewiseFunction.prototype.initialize.call(this, functions);
 	}
 });
@@ -568,7 +568,7 @@ L.CustomColorFunction = L.PiecewiseFunction.extend({
 	options: {
 		interpolate: true
 	},
-	
+
 	initialize: function (minX, maxX, colors, options) {
 		L.Util.setOptions(this, options);
 
@@ -578,53 +578,53 @@ L.CustomColorFunction = L.PiecewiseFunction.extend({
 		var functions = [];
 		var colorFunction;
 		var next;
-		
+
 		var func = new L.LinearFunction([0, minX], [count, maxX]);
-		
+
 		for (var i = 0; i < count; ++i) {
 			next = i + 1;
 			//colorFunction = this.options.interpolate ? new L.RGBColorBlendFunction(minX + xRange * i, minX + xRange * next, colors[i], colors[next]) : new L.RGBColorBlendFunction(minX + xRange * i, minX + xRange * next, colors[i], colors[i]);
 			colorFunction = this.options.interpolate ? new L.RGBColorBlendFunction(func.evaluate(i), func.evaluate(next), colors[i], colors[next]) : new L.RGBColorBlendFunction(func.evaluate(i), func.evaluate(next), colors[i], colors[i]);
-			
-			functions.push(colorFunction);	
+
+			functions.push(colorFunction);
 		}
-		
+
 		func = null;
-		
+
 		L.PiecewiseFunction.prototype.initialize.call(this, functions);
 	}
-	
+
 });
 
 
 L.CategoryFunction = L.Class.extend({
 	initialize: function (categoryMap, options) {
-		
+
 		L.Util.setOptions(this, options);
-		
+
 		this._categoryKeys = Object.keys(categoryMap);
 		this._categoryMap = categoryMap;
-		
+
 		this._preProcess = this.options.preProcess;
 		this._postProcess = this.options.postProcess;
 	},
-	
+
 	evaluate: function (x) {
 		var y;
-		
+
 		if (this._preProcess) {
 			x = this._preProcess(x);
 		}
-		
+
 		y = this._categoryMap[x];
-		
+
 		if (this._postProcess) {
 			y = this._postProcess(y);
 		}
-		
+
 		return y;
 	},
-	
+
 	getCategories: function () {
 		return this._categoryKeys;
 	}
@@ -796,17 +796,17 @@ L.Util.pointToGeoJSON = function () {
 		},
 		properties: {}
 	};
-	
+
 	for (var key in this.options) {
 		if (this.options.hasOwnProperty(key)) {
 			var value = this.options[key];
-			
+
 			if (typeof(value) !== 'function') {
 				feature.properties[key] = value;
 			}
 		}
 	}
-	
+
 	return feature;
 };
 
@@ -1155,9 +1155,9 @@ L.SVGPathBuilder = L.Class.extend({
 		if (points.length > 0) {
 
 			var point = points[0];
-			
+
 			digits = digits !== null ? digits : 2;
-			
+
 			var startChar = 'M';
 			var lineToChar = 'L';
 			var closePath = 'Z';
@@ -1283,7 +1283,7 @@ L.StyleConverter = {
 
 	setCSSProperty: function (element, key, value, keyMap) {
 		keyMap = keyMap || L.StyleConverter.keyMap;
-		
+
 		var cssProperty = keyMap[key];
 		var cssText = '';
 
@@ -1385,7 +1385,7 @@ L.HTMLUtils = {
 		var table = L.DomUtil.create('table', className, fragment);
 		var thead = L.DomUtil.create('thead', '', table);
 		var tbody = L.DomUtil.create('tbody', '', table);
-		
+
 		var thead_tr = L.DomUtil.create('tr', '', thead);
         var thead_values = ['Name','Value'];
         for (var i = 0, l = thead_values.length; i < l; i++) {
@@ -1412,7 +1412,7 @@ L.HTMLUtils = {
 					container.appendChild(L.HTMLUtils.buildTable(value, ignoreFields));
 					value = container.innerHTML;
 				}
-				
+
 				var tbody_tr = L.DomUtil.create('tr', '', tbody);
                 var tbody_values = [property, value];
                 for (i = 0, l = tbody_values.length; i < l; i++) {
@@ -1508,9 +1508,9 @@ L.Color = L.Class.extend({
 	 */
 	rgbToHSL: function(r, g, b){
 	    r /= 255;
-	    g /= 255; 
+	    g /= 255;
 	    b /= 255;
-	    
+
 	    var max = Math.max(r, g, b), min = Math.min(r, g, b);
 	    var h, s, l = (max + min) / 2;
 
@@ -1551,7 +1551,7 @@ L.Color = L.Class.extend({
             if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
             return p;
         };
-        
+
 	    if(s === 0){
 	        r = g = b = l; // achromatic
 	    }else{
@@ -1755,14 +1755,14 @@ L.Animation = L.Class.extend({
 		this._easeFunction = easeFunction; // Function that takes time as an input parameter
 		this._animateFrame = animateFrame;
 	},
-	
+
 	run: function (el, options) { // (HTMLElement, Point[, Number, Number])
 		this.stop();
 
 		this._el = el;
 		this._inProgress = true;
 		this._duration = options.duration || 0.25;
-		
+
 		this._animationOptions = options;
 		this._startTime = +new Date();
 
@@ -2381,10 +2381,10 @@ var TextFunctions = TextFunctions || {
 		if (this.options.text) {
 			this._createText(this.options.text);
 		}
-		
+
 		if (this.options.wordCloud) {
 			var options = this.options.wordCloud;
-			
+
 			if (options.words.length > 0) {
 				var me = this;
 				setTimeout(function () {
@@ -2691,7 +2691,7 @@ var PathFunctions = PathFunctions || {
 		options.id = 'filter' + filterGuid;
 
 		var key;
-		
+
 		for (key in options) {
 			filter.setAttribute(key, options[key]);
 		}
@@ -2743,7 +2743,7 @@ var PathFunctions = PathFunctions || {
 				element.setAttribute(key, attributes[key]);
 			}
 		}
-		
+
 		return element;
 	},
 
@@ -2759,22 +2759,22 @@ var PathFunctions = PathFunctions || {
 	},
 
 	_createPattern: function (patternOptions) {
-		
+
 		if (this._pattern) {
 			this._defs.removeChild(this._pattern);
 		}
-		
+
 		var pattern = this._createCustomElement('pattern', patternOptions);
-		
+
 		this._pattern = pattern;
-		
+
 		return pattern;
 	},
-	
+
 	_createWordCloudPattern: function (wordCloudOptions) {
 		var patternGuid = ''; //L.Util.guid();
 		var patternOptions = wordCloudOptions.patternOptions = wordCloudOptions.patternOptions || {};
-		
+
 		if (!this._defs) {
 			this._createDefs();
 		}
@@ -2831,7 +2831,7 @@ var PathFunctions = PathFunctions || {
         }
 
 	},
-	
+
 	_createWordCloud: function (element, wordCloudOptions) {
 		//var fragment = document.createDocumentFragment();
 		var width = wordCloudOptions.patternOptions.width;
@@ -2847,7 +2847,7 @@ var PathFunctions = PathFunctions || {
 		rect.style.fill = this.options.fillColor || '#000';
 		rect.setAttribute('transform', "translate(" + -width/2 + ',' + -height/2 + ")");
 		element.appendChild(rect);
-		
+
 		var draw = function (words, element) {
 			return function (words) {
 			  var id = "svg" + L.Util.guid();
@@ -2866,17 +2866,17 @@ var PathFunctions = PathFunctions || {
 		        .text(function(d) { return d[textField]; });
 			};
 		  };
-		  
+
 		var fill = wordCloudOptions.textFillColor || d3.scale.category20();
 		var scale = d3.scale.linear();
-		
+
 		var max = words[0][countField];
 		var min = words[words.length - 1][countField];
-		
+
 		var fontSize = wordCloudOptions.fontSize || d3.scale.log().domain([min, max]).range([10, 40]);
-		
+
 		scale.domain([0, 10]).range([-60, 60]);
-		
+
         d3.layout.cloud().size([width, height])
           .spiral('rectangular')
           .timeInterval(Infinity)
@@ -2896,9 +2896,9 @@ var PathFunctions = PathFunctions || {
 		if (this._shape) {
 			this._container.removeChild(this._shape);
 		}
-		
+
 		var shape = this._createCustomElement(type, shapeOptions);
-		
+
 		return shape;
 	},
 
@@ -2992,21 +2992,21 @@ var PathFunctions = PathFunctions || {
 		this._container.insertBefore(shape, this._defs);
 
 		this._shape = shape;
-		
+
 		var me = this;
-		
+
 		this._shape.addEventListener('mouseover', function () {
 			me.fire('mouseover');
 		});
-		
+
 		this._shape.addEventListener('mouseout', function () {
 			me.fire('mouseout');
 		});
-		
+
 		this._shape.addEventListener('mousemove', function () {
 			me.fire('mousemove');
 		});
-		
+
 		var anchorPoint = this.getTextAnchor();
 
 		if (this._shape && anchorPoint) {
@@ -3027,7 +3027,7 @@ var PathFunctions = PathFunctions || {
 		this.__updateStyle.call(this, layer);
 
 		var context = layer ? layer : this;
-		
+
 		if (context.options.stroke) {
 			if (context.options.lineCap) {
 				context._path.setAttribute('stroke-linecap', context.options.lineCap);
@@ -3084,7 +3084,7 @@ var PathFunctions = PathFunctions || {
                 }, 0);
             }
         }
-		
+
 		context._applyCustomStyles();
 
 	}
@@ -3154,14 +3154,14 @@ L.CircleMarker = L.CircleMarker.extend({
 			this._createShapeImage(this.options.shapeImage);
 		}
 	},
-	
+
 	getTextAnchor: function () {
 		var point = null;
-		
+
 		if (this._point) {
 			point = new L.Point(this._point.x, this._point.y);
 		}
-		
+
 		return point;
 	}
 });
@@ -3242,22 +3242,22 @@ L.MapMarker = L.Path.extend({
 		this.options.radius = radius;
 		return this.redraw();
 	},
-	
+
 	setInnerRadius: function (innerRadius) {
 		this.options.innerRadius = innerRadius;
 		return this.redraw();
 	},
-	
+
 	setRotation: function (rotation) {
 		this.options.rotation = rotation;
 		return this.redraw();
 	},
-	
+
 	setNumberOfSides: function (numberOfSides) {
 		this.options.numberOfSides = numberOfSides;
 		return this.redraw();
 	},
-	
+
 	getPathString: function () {
 		var anchorPoint = this.getTextAnchor();
 
@@ -3280,11 +3280,11 @@ L.MapMarker = L.Path.extend({
 
 	getTextAnchor: function () {
 		var point = null;
-		
+
 		if (this._point) {
 			point = new L.Point(this._point.x, this._point.y - 2 * this.options.radius);
 		}
-		
+
 		return point;
 	},
 
@@ -3346,7 +3346,7 @@ L.MapMarker = L.Path.extend({
 			this._createShapeImage(this.options.shapeImage);
 		}
 	},
-	
+
 	toGeoJSON: function () {
 		return L.Util.pointToGeoJSON.call(this);
 	}
@@ -3419,36 +3419,36 @@ L.RegularPolygonMarker = L.Path.extend({
 		this.options.radius = radius;
 		return this.redraw();
 	},
-	
+
 	setRadiusXY: function (radiusX, radiusY) {
 		this.options.radius = null;
 		this.options.radiusX = radiusX;
 		this.options.radiusY = radiusY;
 		return this.redraw();
 	},
-	
+
 	setInnerRadius: function (innerRadius) {
 		this.options.innerRadius = innerRadius;
 		return this.redraw();
 	},
-	
+
 	setInnerRadiusXY: function (innerRadiusX, innerRadiusY) {
 		this.options.innerRadius = null;
 		this.options.innerRadiusX = innerRadiusX;
 		this.options.innerRadiusY = innerRadiusY;
 		return this.redraw();
 	},
-	
+
 	setRotation: function (rotation) {
 		this.options.rotation = rotation;
 		return this.redraw();
 	},
-	
+
 	setNumberOfSides: function (numberOfSides) {
 		this.options.numberOfSides = numberOfSides;
 		return this.redraw();
 	},
-	
+
 	getLatLng: function () {
 		return this._latlng;
 	},
@@ -3528,7 +3528,7 @@ L.RegularPolygonMarker = L.Path.extend({
 			this._createShapeImage(this.options.shapeImage);
 		}
 	},
-	
+
 	toGeoJSON: function () {
 		return L.Util.pointToGeoJSON.call(this);
 	}
@@ -3552,7 +3552,7 @@ L.StarMarker = L.RegularPolygonMarker.extend({
 		this.options.numberOfPoints = numberOfPoints;
 		return this.redraw();
 	},
-	
+
 	_getPoints: function (inner) {
 		var maxDegrees = this.options.maxDegrees || 360;
 		var angleSize = maxDegrees / this.options.numberOfPoints;
@@ -3685,16 +3685,16 @@ L.SVGMarker = L.Path.extend({
 	projectLatlngs: function () {
 		this._point = this._map.latLngToLayerPoint(this._latlng);
 	},
-	
+
 	setLatLng: function (latlng) {
 		this._latlng = latlng;
 		this.redraw();
 	},
-	
+
 	getLatLng: function () {
 		return this._latlng;
 	},
-	
+
 	getPathString: function () {
 		var me = this;
 
@@ -3770,7 +3770,7 @@ L.SVGMarker = L.Path.extend({
 			addSVG();
 		}
 	},
-	
+
 	toGeoJSON: function () {
 		return pointToGeoJSON.call(this);
 	}
@@ -3786,11 +3786,11 @@ L.MarkerGroup = L.FeatureGroup.extend({
 
 		this.setLatLng(latlng);
 	},
-	
+
 	setStyle: function (style) {
 		return this;
 	},
-	
+
 	setLatLng: function (latlng) {
 		this._latlng = latlng;
 		this.eachLayer(function (layer) {
@@ -3798,28 +3798,28 @@ L.MarkerGroup = L.FeatureGroup.extend({
 				layer.setLatLng(latlng);
 			}
 		});
-		
+
 		return this;
 	},
-	
+
 	getLatLng: function (latlng) {
 		return this._latlng;
 	},
-	
+
 	toGeoJSON: function () {
 		var featureCollection = {
 			type: 'FeatureCollection',
 			features: []
 		};
-		
+
 		var eachLayerFunction = function (featureCollection) {
 			return function (layer) {
 				featureCollection.features.push(L.Util.pointToGeoJSON.call(layer));
 			};
 		};
-		
+
 		this.eachLayer(eachLayerFunction(featureCollection));
-		
+
 		return featureCollection;
 	}
 });
@@ -3889,14 +3889,14 @@ L.BarMarker = L.Path.extend({
 		var halfWidth = this.options.width / 2;
 		var sePoint, nePoint, nwPoint, swPoint;
 		var height = this.options.value / this.options.maxValue * this.options.maxHeight;
-		
+
 		sePoint = new L.Point(startX + halfWidth, startY);
 		nePoint = new L.Point(startX + halfWidth, startY - height);
 		nwPoint = new L.Point(startX - halfWidth, startY - height);
 		swPoint = new L.Point(startX - halfWidth, startY);
-		
+
 		points = [sePoint, nePoint, nwPoint, swPoint];
-		
+
 		return points;
 	}
 
@@ -3915,10 +3915,10 @@ L.ChartMarker = L.FeatureGroup.extend({
 
 		this._layers = {};
 		this._latlng = centerLatLng;
-		
+
 		this._loadComponents();
 	},
-	
+
 	setLatLng: function (latlng) {
 		this._latlng = latlng;
 		return this.redraw();
@@ -3931,91 +3931,92 @@ L.ChartMarker = L.FeatureGroup.extend({
 	_loadComponents: function () {
 		// TODO: Override this in subclasses
 	},
-	
+
 	_highlight: function (options) {
 		if (options.weight) {
 			options.weight *= 2;
 		}
-		
+
 		return options;
 	},
-	
+
 	_unhighlight: function (options) {
 		if (options.weight) {
 			options.weight /= 2;
 		}
-		
+
 		return options;
 	},
-	
+
 	_bindMouseEvents: function (chartElement) {
 		var self = this;
 		var tooltipOptions = this.options.tooltipOptions;
-	
-		chartElement.on('mouseover', function (e) {
-			var currentOptions = this.options;
-			var key = currentOptions.key;
-			var value = currentOptions.value;
-			var layerPoint = e.layerPoint;
-			var x = layerPoint.x - this._point.x;
-			var y = layerPoint.y - this._point.y;
-			var iconSize = currentOptions.iconSize;
-			var newX = x; 
-			var newY = y;
-			var newPoint;
-			var offset = 5;
-			
-			newX = x < 0 ? iconSize.x - x + offset: -x - offset;
-			newY = y < 0 ? iconSize.y - y + offset: -y - offset;
-			
-			newPoint = new L.Point(newX, newY);
-			
-			var legendOptions = {};
-			var displayText = currentOptions.displayText ? currentOptions.displayText(value) : value;
-			
-			legendOptions[key] = {
-				name: currentOptions.displayName,
-				value: displayText
-			};
-			
-			var icon = new L.LegendIcon(legendOptions, currentOptions, {
-				className: 'leaflet-div-icon',
-				iconSize: tooltipOptions ? tooltipOptions.iconSize : iconSize,
-				iconAnchor: newPoint
+		if(this.options.tooltipOptions.showTooltips){
+			chartElement.on('mouseover', function (e) {
+				var currentOptions = this.options;
+				var key = currentOptions.key;
+				var value = currentOptions.value;
+				var layerPoint = e.layerPoint;
+				var x = layerPoint.x - this._point.x;
+				var y = layerPoint.y - this._point.y;
+				var iconSize = currentOptions.iconSize;
+				var newX = x;
+				var newY = y;
+				var newPoint;
+				var offset = 5;
+
+				newX = x < 0 ? iconSize.x - x + offset: -x - offset;
+				newY = y < 0 ? iconSize.y - y + offset: -y - offset;
+
+				newPoint = new L.Point(newX, newY);
+
+				var legendOptions = {};
+				var displayText = currentOptions.displayText ? currentOptions.displayText(value) : value;
+
+				legendOptions[key] = {
+					name: currentOptions.displayName,
+					value: displayText
+				};
+
+				var icon = new L.LegendIcon(legendOptions, currentOptions, {
+					className: 'leaflet-div-icon',
+					iconSize: tooltipOptions ? tooltipOptions.iconSize : iconSize,
+					iconAnchor: newPoint
+				});
+
+				currentOptions.marker = new L.Marker(self._latlng, {
+					icon: icon
+				});
+
+				currentOptions = self._highlight(currentOptions);
+
+				this.initialize(self._latlng, currentOptions);
+				this.redraw();
+				this.setStyle(currentOptions);
+
+				self.addLayer(currentOptions.marker);
 			});
-			
-			currentOptions.marker = new L.Marker(self._latlng, {
-				icon: icon
+
+			chartElement.on('mouseout', function (e) {
+				var currentOptions = this.options;
+
+				currentOptions = self._unhighlight(currentOptions);
+
+				this.initialize(self._latlng, currentOptions);
+				this.redraw();
+				this.setStyle(currentOptions);
+
+				self.removeLayer(currentOptions.marker);
 			});
-			
-			currentOptions = self._highlight(currentOptions);
-			
-			this.initialize(self._latlng, currentOptions);
-			this.redraw();
-			this.setStyle(currentOptions);
-			
-			self.addLayer(currentOptions.marker);
-		});
-		
-		chartElement.on('mouseout', function (e) {
-			var currentOptions = this.options;
-			
-			currentOptions = self._unhighlight(currentOptions);
-			
-			this.initialize(self._latlng, currentOptions);
-			this.redraw();
-			this.setStyle(currentOptions);
-			
-			self.removeLayer(currentOptions.marker);
-		});
+		}
 	},
-	
+
 	bindPopup: function (content, options) {
 		this.eachLayer(function (layer) {
 			layer.bindPopup(content, options);
 		});
 	},
-	
+
 	openPopup: function (latlng) {
 		for (var i in this._layers) {
 			var layer = this._layers[i];
@@ -4024,7 +4025,7 @@ L.ChartMarker = L.FeatureGroup.extend({
 			break;
 		}
 	},
-	
+
 	closePopup: function () {
 		for (var i in this._layers) {
 			var layer = this._layers[i];
@@ -4033,19 +4034,19 @@ L.ChartMarker = L.FeatureGroup.extend({
 			break;
 		}
 	},
-	
+
 	redraw: function () {
 		this.clearLayers();
 		this._loadComponents();
 	},
-	
+
 	toGeoJSON: function () {
 		return L.Util.pointToGeoJSON.call(this);
 	}
 });
 
 /*
- * 
+ *
  */
 L.BarChartMarker = L.ChartMarker.extend({
 	initialize: function (centerLatLng, options) {
@@ -4081,10 +4082,10 @@ L.BarChartMarker = L.ChartMarker.extend({
 		var data = this.options.data;
 		var chartOptions = this.options.chartOptions;
 		var chartOption;
-		
+
 		x = -((width * count) + (offset * (count - 1))) / 2 + width / 2;
 		y = 0;
-		
+
 		// Iterate through the data values
 		for (var key in data) {
 			value = data[key];
@@ -4092,7 +4093,7 @@ L.BarChartMarker = L.ChartMarker.extend({
 
 			minValue = chartOption.minValue || 0;
 			maxValue = chartOption.maxValue || 100;
-			
+
 			options.fillColor = chartOption.fillColor || this.options.fillColor;
 			options.value = value;
 			options.minValue = minValue;
@@ -4111,13 +4112,13 @@ L.BarChartMarker = L.ChartMarker.extend({
 			options.weight = this.options.weight || 1;
 			options.color = chartOption.color || this.options.color;
 			options.displayText = chartOption.displayText;
-			
+
 			bar = new L.BarMarker(this._latlng, options);
-			
+
 			this._bindMouseEvents(bar);
-			
+
 			this.addLayer(bar);
-			
+
 			x += width + offset;
 		}
 	}
@@ -4131,9 +4132,9 @@ L.RadialBarMarker = L.Path.extend({
 	initialize: function (centerLatLng, options) {
 		L.Path.prototype.initialize.call(this, options);
 
-		this._latlng = centerLatLng;	
+		this._latlng = centerLatLng;
 	},
-	
+
 	options: {
 		fill: true,
 		radius: 10,
@@ -4153,7 +4154,7 @@ L.RadialBarMarker = L.Path.extend({
 	},
 
 	projectLatlngs: function () {
-		this._point = this._map.latLngToLayerPoint(this._latlng);	
+		this._point = this._map.latLngToLayerPoint(this._latlng);
 		this._points = this._getPoints();
 	},
 
@@ -4168,21 +4169,21 @@ L.RadialBarMarker = L.Path.extend({
 			nePoint = new L.Point(point.x + deltaX, point.y - deltaY),
 			sw = map.unproject(swPoint),
 			ne = map.unproject(nePoint);
-	
+
 		return new L.LatLngBounds(sw, ne);
 	},
 
 	getLatLng: function () {
 		return this._latlng;
 	},
-	
+
 	getPathString: function () {
-	
+
 		var angle = this.options.endAngle - this.options.startAngle;
 		var largeArc = angle >= 180 ? '1' : '0';
 		var radiusX = this.options.radiusX || this.options.radius;
 		var radiusY = this.options.radiusY || this.options.radius;
-		var path = 'M' + this._points[0].x.toFixed(2) + ',' + this._points[0].y.toFixed(2) + 'A' + radiusX.toFixed(2) + ',' + radiusY.toFixed(2) + ' 0 ' + largeArc + ',1 ' + this._points[1].x.toFixed(2) + ',' + this._points[1].y.toFixed(2) + 'L'; 
+		var path = 'M' + this._points[0].x.toFixed(2) + ',' + this._points[0].y.toFixed(2) + 'A' + radiusX.toFixed(2) + ',' + radiusY.toFixed(2) + ' 0 ' + largeArc + ',1 ' + this._points[1].x.toFixed(2) + ',' + this._points[1].y.toFixed(2) + 'L';
 
 		if (this._innerPoints) {
 			path = path + this._innerPoints[0].x.toFixed(2) + ',' + this._innerPoints[0].y.toFixed(2);
@@ -4191,13 +4192,13 @@ L.RadialBarMarker = L.Path.extend({
 		else {
 			path = path + this._point.x.toFixed(2) + ',' + this._point.y.toFixed(2) + 'z';
 		}
-		
+
 		if (L.Browser.vml) {
 			path = Core.SVG.path(path);
 		}
-		
+
 		this._path.setAttribute('shape-rendering', 'geometricPrecision');
-		
+
 		return path;
 
 	},
@@ -4208,7 +4209,7 @@ L.RadialBarMarker = L.Path.extend({
 		var degrees = this.options.endAngle + this.options.rotation;
 		var angle = this.options.startAngle + this.options.rotation;
 		var points = [];
-		var radiusX = 'radiusX' in this.options ? this.options.radiusX : this.options.radius; 
+		var radiusX = 'radiusX' in this.options ? this.options.radiusX : this.options.radius;
 		var radiusY = 'radiusY' in this.options ? this.options.radiusY : this.options.radius;
 		var toRad = function (number) {
 			return number * L.LatLng.DEG_TO_RAD;
@@ -4216,26 +4217,26 @@ L.RadialBarMarker = L.Path.extend({
 
 		// Make sure degrees is defined
 		degrees = degrees || 0;
-		
+
 		if (angleDelta === 360.0) {
 			degrees = degrees - 0.1;
 		}
-		
+
 		var startRadians = toRad(angle);
 		var endRadians = toRad(degrees);
-		
+
 		points.push(this._getPoint(startRadians, radiusX, radiusY));
 		points.push(this._getPoint(endRadians, radiusX, radiusY));
-		
+
 		if (this.options.barThickness) {
 			this._innerPoints = [];
 			this._innerPoints.push(this._getPoint(endRadians, radiusX - this.options.barThickness, radiusY - this.options.barThickness));
 			this._innerPoints.push(this._getPoint(startRadians, radiusX - this.options.barThickness, radiusY - this.options.barThickness));
 		}
-		
+
 		return points;
 	},
-	
+
 	_getPoint: function (angle, radiusX, radiusY) {
 		return new L.Point(this._point.x + this.options.position.x + radiusX * Math.cos(angle), this._point.y + this.options.position.y + radiusY * Math.sin(angle));
 	}
@@ -4251,7 +4252,7 @@ L.radialBarMarker = function (centerLatLng, options) {
 L.PieChartMarker = L.ChartMarker.extend({
 	initialize: function (centerLatLng, options) {
 		L.Util.setOptions(this, options);
-		
+
 		L.ChartMarker.prototype.initialize.call(this, centerLatLng, options);
 	},
 
@@ -4265,29 +4266,37 @@ L.PieChartMarker = L.ChartMarker.extend({
 		numberOfSides: 50,
 		mouseOverExaggeration: 1.2,
 		maxDegrees: 360.0,
-		iconSize: new L.Point(50, 40)
+		iconSize: new L.Point(50, 40),
+		highlight: true,
+		tooltipOptions: {
+			showTooltips: true
+		}
 	},
 
 	_highlight: function (options) {
-		var oldRadiusX = options.radiusX;
-        var oldRadiusY = options.radiusY;
-		var oldBarThickness = options.barThickness;
-		options.oldBarThickness = oldBarThickness;
-		options.oldRadiusX = oldRadiusX;
-		options.oldRadiusY = oldRadiusY;
-		options.radiusX *= options.mouseOverExaggeration;
-		options.radiusY *= options.mouseOverExaggeration;
-		options.barThickness = options.radiusX - oldRadiusX + oldBarThickness;
+		if(options.highlight){
+			var oldRadiusX = options.radiusX;
+	        var oldRadiusY = options.radiusY;
+			var oldBarThickness = options.barThickness;
+			options.oldBarThickness = oldBarThickness;
+			options.oldRadiusX = oldRadiusX;
+			options.oldRadiusY = oldRadiusY;
+			options.radiusX *= options.mouseOverExaggeration;
+			options.radiusY *= options.mouseOverExaggeration;
+			options.barThickness = options.radiusX - oldRadiusX + oldBarThickness;
+		}
 		return options;
 	},
-	
+
 	_unhighlight: function (options) {
-		options.radiusX = options.oldRadiusX;
-		options.radiusY = options.oldRadiusY;
-		options.barThickness = options.oldBarThickness;
+		if(options.highlight){
+			options.radiusX = options.oldRadiusX;
+			options.radiusY = options.oldRadiusY;
+			options.barThickness = options.oldBarThickness;
+		}
 		return options;
 	},
-	
+
 	_loadComponents: function () {
 		var value;
 		var sum = 0;
@@ -4301,7 +4310,7 @@ L.PieChartMarker = L.ChartMarker.extend({
 		var chartOptions = this.options.chartOptions;
 		var chartOption;
 		var key;
-		
+
 		var getValue = function (data, key) {
 			var value = 0.0;
 			if (data[key]) {
@@ -4309,25 +4318,25 @@ L.PieChartMarker = L.ChartMarker.extend({
 			}
 			return value;
 		};
-		
+
 		// Calculate the sum of the data values
 		for (key in data) {
 			value = getValue(data, key);
 			sum += value;
 		}
-		
+
 		// Iterate through the data values
 		if (sum > 0) {
-			for (key in data) {		
+			for (key in data) {
 				value = parseFloat(data[key]) || 0;
 				chartOption = chartOptions[key];
 				percentage = value / sum;
-			
+
 				angle = percentage * maxDegrees;
-			
+
 				options.startAngle = lastAngle;
 				options.endAngle = lastAngle + angle;
-				
+
 				options.fillColor = chartOption.fillColor;
 				options.color = chartOption.color || '#000';
 				options.radiusX = this.options.radiusX || this.options.radius;
@@ -4339,13 +4348,13 @@ L.PieChartMarker = L.ChartMarker.extend({
 				options.value = value;
 				options.displayName = chartOption.displayName;
 				options.displayText = chartOption.displayText;
-			
+
 				bar = new L.RadialBarMarker(this._latlng, options);
-			
+
 				this._bindMouseEvents(bar);
-			
+
 				lastAngle = options.endAngle;
-			
+
 				this.addLayer(bar);
 			}
 		}
@@ -4357,7 +4366,7 @@ L.pieChartMarker = function (centerLatLng, options) {
 };
 
 /*
- * 
+ *
  */
 L.CoxcombChartMarker = L.PieChartMarker.extend({
 	statics: {
@@ -4401,25 +4410,25 @@ L.CoxcombChartMarker = L.CoxcombChartMarker.extend({
 		var data = this.options.data;
 		var chartOptions = this.options.chartOptions;
 		var chartOption;
-		
+
 		angle = maxDegrees / count;
-		
+
 		var postProcess = function (value) {
 			return Math.sqrt(count * value / Math.PI);
 		};
-		
+
 		// Iterate through the data values
 		for (var key in data) {
 			value = parseFloat(data[key]) || 0;
 			chartOption = chartOptions[key];
-			
+
 			minValue = chartOption.minValue || 0;
 			maxValue = chartOption.maxValue;
-			
+
 			// If the size mode is radius, then we'll just vary the radius proportionally to the value
 			if (this.options.sizeMode === L.CoxcombChartMarker.SIZE_MODE_RADIUS) {
 				var evalFunctionX = new L.LinearFunction(new L.Point(minValue, 0), new L.Point(maxValue, radiusX));
-				var evalFunctionY = new L.LinearFunction(new L.Point(minValue, 0), new L.Point(maxValue, radiusY)); 
+				var evalFunctionY = new L.LinearFunction(new L.Point(minValue, 0), new L.Point(maxValue, radiusY));
 				options.radiusX = evalFunctionX.evaluate(value);
 				options.radiusY = evalFunctionY.evaluate(value);
 			}
@@ -4427,33 +4436,33 @@ L.CoxcombChartMarker = L.CoxcombChartMarker.extend({
 				// Otherwise, we'll vary the area proportionally to the value and calculate the radius from the area value
 				var radius = Math.max(radiusX, radiusY);
 				var maxArea = (Math.PI * Math.pow(radius, 2)) / count;
-				
+
 				var evalFunctionArea = new L.LinearFunction(new L.Point(minValue, 0), new L.Point(maxValue, maxArea), {
 					postProcess: postProcess
 				});
-				
+
 				options.radiusX = evalFunctionArea.evaluate(value);
 				options.radiusY = options.radiusX;
 			}
-			
+
 			options.startAngle = lastAngle;
 			options.endAngle = lastAngle + angle;
 			options.fillColor = chartOption.fillColor;
 			options.color = chartOption.color || '#000';
 			options.rotation = 0;
-			
+
 			// Set the key and value for use later
 			options.key = key;
 			options.value = value;
 			options.displayName = chartOption.displayName;
 			options.displayText = chartOption.displayText;
-			
+
 			bar = new L.RadialBarMarker(this._latlng, options);
-			
+
 			this._bindMouseEvents(bar);
-			
+
 			lastAngle = options.endAngle;
-			
+
 			this.addLayer(bar);
 		}
 	}
@@ -4464,12 +4473,12 @@ L.coxcombChartMarker = function (centerLatLng, options) {
 };
 
 /*
- * 
+ *
  */
 L.RadialBarChartMarker = L.ChartMarker.extend({
 	initialize: function (centerLatLng, options) {
 		L.Util.setOptions(this, options);
-		
+
 		L.ChartMarker.prototype.initialize.call(this, centerLatLng, options);
 	},
 
@@ -4500,19 +4509,19 @@ L.RadialBarChartMarker = L.ChartMarker.extend({
 		var chartOption;
 		var barThickness = this.options.barThickness || 4;
 		var offset = this.options.offset || 2;
-		
+
 		// Iterate through the data values
 		for (var key in data) {
 			value = parseFloat(data[key]);
 			chartOption = chartOptions[key];
-			
+
 			minValue = chartOption.minValue || 0;
 			maxValue = chartOption.maxValue || 100;
-			
+
 			var angleFunction = new L.LinearFunction(new L.Point(minValue, 0), new L.Point(maxValue, maxDegrees));
-			
+
 			angle = angleFunction.evaluate(value);
-			
+
 			options.startAngle = this.options.rotation;
 			options.endAngle = this.options.rotation + angle;
 			options.fillColor = chartOption.fillColor;
@@ -4525,16 +4534,16 @@ L.RadialBarChartMarker = L.ChartMarker.extend({
 			options.displayName = chartOption.displayName;
 			options.displayText = chartOption.displayText;
 			options.weight = this.options.weight || 1;
-			
+
 			bar = new L.RadialBarMarker(this._latlng, options);
-			
+
 			this._bindMouseEvents(bar);
-			
+
 			this.addLayer(bar);
-			
+
 			lastRadiusX += barThickness + offset;
 			lastRadiusY += barThickness + offset;
-			
+
 		}
 	}
 });
@@ -4547,13 +4556,13 @@ L.StackedRegularPolygonMarker = L.ChartMarker.extend({
 	options: {
 		iconSize: new L.Point(50, 40)
 	},
-	
+
 	initialize: function (centerLatLng, options) {
 		L.Util.setOptions(this, options);
-		
+
 		L.ChartMarker.prototype.initialize.call(this, centerLatLng, options);
 	},
-	
+
 	_loadComponents: function () {
 		var value;
 		var lastRadiusX = 0;
@@ -4564,35 +4573,35 @@ L.StackedRegularPolygonMarker = L.ChartMarker.extend({
 		var chartOptions = this.options.chartOptions;
 		var chartOption;
 		var key;
-		
+
 		// Iterate through the data values
 		var bars = [];
-		
-		for (key in data) {		
+
+		for (key in data) {
 			value = parseFloat(data[key]);
 			chartOption = chartOptions[key];
-			
+
 			minValue = chartOption.minValue || 0;
 			maxValue = chartOption.maxValue || 100;
-			
+
 			// TODO:  Add support for x and y radii
 			minRadius = chartOption.minRadius || 0;
 			maxRadius = chartOption.maxRadius || 10;
-			
+
 			options.fillColor = chartOption.fillColor || this.options.fillColor;
 			options.value = value;
 			options.minValue = minValue;
 			options.maxValue = maxValue;
-			
+
 			var evalFunction = new L.LinearFunction(new L.Point(minValue, minRadius), new L.Point(maxValue, maxRadius));
-			
+
 			var barThickness = evalFunction.evaluate(value);
-			
+
 			options.radiusX = lastRadiusX + barThickness;
 			options.radiusY = lastRadiusY + barThickness;
 			options.innerRadiusX = lastRadiusX;
 			options.innerRadiusY = lastRadiusY;
-			
+
 			options.key = key;
 			options.displayName = chartOption.displayName;
 			options.opacity = this.options.opacity || 1.0;
@@ -4600,14 +4609,14 @@ L.StackedRegularPolygonMarker = L.ChartMarker.extend({
 			options.weight = this.options.weight || 1;
 			options.color = chartOption.color || this.options.color;
 			options.displayText = chartOption.displayText;
-			
+
 			bar = new L.RegularPolygonMarker(this._latlng, options);
-			
+
 			this._bindMouseEvents(bar);
-			
+
 			lastRadiusX = options.radiusX;
 			lastRadiusY = options.radiusY;
-			
+
 			if (this.options.drawReverse) {
 				bars.push(bar);
 			}
@@ -4615,26 +4624,26 @@ L.StackedRegularPolygonMarker = L.ChartMarker.extend({
 				this.addLayer(bar);
 			}
 		}
-		
+
 		if (this.options.drawReverse) {
 			var item = bars.pop();
-		
+
 			while (item) {
 				this.addLayer(item);
 				item = bars.pop();
 			}
 		}
-		
+
 	}
 });
 
 /*
- * 
+ *
  */
 L.RadialMeterMarker = L.ChartMarker.extend({
 	initialize: function (centerLatLng, options) {
 		L.Util.setOptions(this, options);
-		
+
 		L.ChartMarker.prototype.initialize.call(this, centerLatLng, options);
 	},
 
@@ -4675,31 +4684,31 @@ L.RadialMeterMarker = L.ChartMarker.extend({
 		var numSegments = this.options.numSegments || 10;
 		var angleDelta = maxDegrees / numSegments;
 		var displayOptions;
-		
+
 		// Iterate through the data values
 		for (var key in data) {
 			value = parseFloat(data[key]);
 			chartOption = chartOptions[key];
 			displayOptions = this.options.displayOptions ? this.options.displayOptions[key] : {};
-			
+
 			minValue = chartOption.minValue || 0;
 			maxValue = chartOption.maxValue || 100;
-			
+
 			var range = maxValue - minValue;
 
 			var angle = (maxDegrees / range) * (value - minValue);
-			
+
 			var endAngle = startAngle + angle;
 			var maxAngle = startAngle + maxDegrees;
-			
+
 			var evalFunction = new L.LinearFunction(new L.Point(startAngle, minValue), new L.Point(maxAngle, maxValue));
 			var delta, evalValue;
-			
+
 			while (lastAngle < endAngle) {
 				options.startAngle = lastAngle;
-				
+
 				delta = Math.min(angleDelta, endAngle - lastAngle);
-				
+
 				options.endAngle = lastAngle + delta;
 				options.fillColor = chartOption.fillColor;
 				options.radiusX = radiusX;
@@ -4710,27 +4719,27 @@ L.RadialMeterMarker = L.ChartMarker.extend({
 				options.value = value;
 				options.displayName = chartOption.displayName;
 				options.displayText = chartOption.displayText;
-				
+
 				evalValue = evalFunction.evaluate(lastAngle + delta);
-				
+
 				for (var displayKey in displayOptions) {
 					options[displayKey] = displayOptions[displayKey].evaluate ? displayOptions[displayKey].evaluate(evalValue) : displayOptions[displayKey];
 				}
-				
+
 				bar = new L.RadialBarMarker(this._latlng, options);
-				
+
 				this._bindMouseEvents(bar);
-				
+
 				this.addLayer(bar);
-				
+
 				lastAngle += delta;
 			}
-			
+
 			// Add a background
 			if (this.options.backgroundStyle) {
 				if (lastAngle < maxAngle) {
 					delta = maxAngle - lastAngle;
-				
+
 					options.endAngle = lastAngle + delta;
 					options.radiusX = radiusX;
 					options.radiusY = radiusY;
@@ -4740,17 +4749,17 @@ L.RadialMeterMarker = L.ChartMarker.extend({
 					options.value = value;
 					options.displayName = chartOption.displayName;
 					options.displayText = chartOption.displayText;
-					
+
 					options.fillColor = null;
 					options.fill = false;
 					options.gradient = false;
-					
+
 					for (var property in this.options.backgroundStyle) {
 						options[property] = this.options.backgroundStyle[property];
 					}
-					
+
 					evalValue = evalFunction.evaluate(lastAngle + delta);
-				
+
 					bar = new L.RadialBarMarker(this._latlng, options);
 
 					this.addLayer(bar);
