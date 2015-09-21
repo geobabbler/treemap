@@ -14,7 +14,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.startX = 39.2847064,
       $scope.startY = -76.6204859,
       $scope.startZ = 16;
-    $scope.maxBounds = L.latLngBounds(L.latLng(39.21789, -76.84456), L.latLng(39.35156, -76.39618));
+    $scope.maxBounds = L.latLngBounds(L.latLng(38.5, -77.2), L.latLng(39.8, -75.9));
 
     /*
      * Mapping / Leaflet parts
@@ -430,12 +430,16 @@ var layerGroup = new L.layerGroup();
 
     //push and splice tree year labels in and out of the array
     $scope.toggleTreeYear = function(year) {
-      if (indexOf.call($scope.disabledYearArray, year) === -1) {
-        $scope.disabledYearArray.push(year);
-      } else {
-        $scope.disabledYearArray.splice(indexOf.call($scope.disabledYearArray, year), 1);
-      }
-      $scope.drawTrees();
+
+        if (indexOf.call($scope.disabledYearArray, year) === -1) {
+          //ensures at least one year filter is on at all times
+          if($scope.disabledYearArray.length < 4){
+            $scope.disabledYearArray.push(year);
+          }
+        } else {
+          $scope.disabledYearArray.splice(indexOf.call($scope.disabledYearArray, year), 1);
+        }
+        $scope.drawTrees();
     }
 
     function getSize(d) {
