@@ -43,6 +43,19 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', '$
   $scope.hideFilters = function(){
     $scope.filterOn = false;
   }
+  $scope.pinned = false;
+  $scope.openFilterMenu = false;
+  $scope.toggleShowFilter = function(type){
+    //if the menu is not pinned and the filtertoggle is not pin(aka hover)
+    if((type !== 'pin') && ($scope.pinned === false)){
+      $scope.openFilterMenu = !$scope.openFilterMenu;
+    }
+    if(type === 'pin'){
+      $scope.pinned = !$scope.pinned;
+
+    }
+  }
+
 
   $scope.aboutModal = function (size) {
 

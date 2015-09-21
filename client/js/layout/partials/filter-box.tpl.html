@@ -1,9 +1,9 @@
-<div class="filterbox" ng-mouseenter="showFilters()" ng-mouseleave="hideFilters()">
-  <div class="col-md-12" ng-hide="filterOn">
-    {{treeCount}} Trees Visible | Filters <i class="fa fa-arrow-circle-o-down"></i>
+<div class="filterbox" ng-mouseenter="toggleShowFilter('hover')" ng-mouseleave="toggleShowFilter('hover')">
+  <div class="col-md-12" ng-hide="openFilterMenu">
+    {{treeCount}} Trees Visible | <a class="btn btn-default btn-xs" ng-click="toggleShowFilter('pin')">Filter <i class="fa fa-arrow-circle-o-down"></i></a>
   </div>
-  <div class="col-md-12 col-lg-12" ng-show="filterOn">
-    {{treeCount}} Trees Visible | Filters <i class="fa fa-arrow-circle-o-up"></i>
+  <div class="col-md-12 col-lg-12" ng-show="openFilterMenu">
+    {{treeCount}} Trees Visible | <a class="btn btn-default btn-xs active" ng-click="toggleShowFilter('pin')">Filter <i class="fa fa-arrow-circle-o-up"></i></a>
     <div class="row">
       <table class="table">
         <tbody class="info legend">

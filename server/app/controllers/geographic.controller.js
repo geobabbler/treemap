@@ -58,7 +58,7 @@ exports.showTrees = function(req, res, next) {
       }
       myQuery += ` GROUP BY common_nam, genus, species, year, geom;`
 
-      console.log(myQuery)
+      // console.log(myQuery)
       client.query(myQuery, function(err, result) {
 
         if (result.rowCount == 0) {
@@ -126,7 +126,7 @@ exports.clusterByReducedPrecision = function(req, res, next) {
             myQuery += ` and year::int != all (array[${filter}])`
           }
           myQuery += ` GROUP BY neighborhoodname`;
-          console.log(myQuery);
+          // console.log(myQuery);
     client.query(myQuery, function(err, result) {
       var totalTrees = 0;
       if (result.rowCount == 0) {
