@@ -1,15 +1,16 @@
 <div class="filterbox" ng-mouseenter="toggleShowFilter('hover')" ng-mouseleave="toggleShowFilter('hover')">
   <div class="col-md-12" ng-hide="openFilterMenu">
-    {{treeCount}} Trees Visible | <a class="btn btn-default btn-xs" ng-click="toggleShowFilter('pin')">Filter <i class="fa fa-arrow-circle-o-down"></i></a>
+    {{treeCount}} Trees Visible | <a class="btn btn-default btn-xs" ng-click="toggleShowFilter('pin')">Legend <i class="fa fa-arrow-circle-o-down"></i></a>
   </div>
   <div class="col-md-12 col-lg-12" ng-show="openFilterMenu">
-    {{treeCount}} Trees Visible | <a class="btn btn-default btn-xs active" ng-click="toggleShowFilter('pin')">Filter <i class="fa fa-arrow-circle-o-up"></i></a>
+    {{treeCount}} Trees Visible | <a class="btn btn-default btn-xs active" ng-click="toggleShowFilter('pin')">Legend <i class="fa fa-arrow-circle-o-up"></i></a>
     <div class="row">
       <table class="table">
         <tbody class="info legend">
+          <div style="padding-left:8px;"><b>Tree Planted in Year:</b></div>
           <tr ng-class="{'danger':(disabledYearArray.indexOf(year.label) > -1)}" ng-repeat="year in treeConfig | orderObjectBy:'order'" ng-click="toggleTreeYear(year.label)">
             <td>
-              <i style="background:{{year.color}}; border: 2px solid black;"></i>
+              <i style="background:{{year.color}}; border: 2px solid black; border-radius: 50%;"></i>
             </td>
             <td>{{year.label}}
               <b>({{year.count}})</b>
@@ -17,7 +18,8 @@
           </tr>
         </tbody>
       </table>
-      <small ng-show="disabledYearArray.length == 4"><b>at least one year must be on</b></small>
+      <span style="padding-left:8px;">click year to turn off</span></br>
+      <small style="padding-left:8px;" ng-show="disabledYearArray.length == 4"><b>at least one year must be on</b></small>
     </div>
   </div>
 </div>

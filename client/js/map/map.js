@@ -97,13 +97,13 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
     $scope.treeConfig = {
       "other": {
-        "order": 1,
+        "order": 5,
         "label": "Before 2010",
         "color": "#edf8fb",
         "count": 0
       },
       "2010": {
-        "order": 2,
+        "order": 4,
         "label": "2010",
         "color": "#b2e2e2",
         "count": 0
@@ -115,13 +115,13 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         "count": 0
       },
       "2012": {
-        "order": 4,
+        "order": 2,
         "label": "2012",
         "color": "#2ca25f",
         "count": 0
       },
       "2013": {
-        "order": 5,
+        "order": 1,
         "label": "2013",
         "color": "#006d2c",
         "count": 0
