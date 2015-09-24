@@ -131,10 +131,13 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     function pointSize(data) {
       return 8 + (data / 15);
     }
+
     //empty layer for the trees
     $scope.treeLayer = L.geoJson('', {
       onEachFeature: function(feature, layer) {
         layer.on('mouseover click', function(e) {
+          var iconContent = changeIcon(String(feature.properties.year));
+          console.log(iconContent)
           var hover_bubble = new L.Rrose({
               offset: new L.Point(0, -2),
               closeButton: false,
@@ -142,15 +145,16 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
               y_bounds: 149
             })
             .setContent('<div class="row" style="text-align: center;">' +
-              '<i class="fa fa-leaf"></i>' +
+              `<i class="fa fa-leaf"></i>` +
               '</div>' +
               '<hr>' +
               '<div class="row">' +
               `<b>plant year: </b>${String(feature.properties.year)}</br>` +
               `<b>trees here: </b>${String(feature.properties.total)}</br>` +
+              `<b>planting org: </b>${String(feature.properties.planted_by)}</br>` +
               `<b>common name: </b>${feature.properties.common_name}</br>` +
               `<b>genus: </b>${feature.properties.genus}</br>` +
-              '<b>species: </b>' + feature.properties.species +
+              `<b>species: </b>${feature.properties.species}` +
               '</div>' +
               '</div>')
             .setLatLng(e.latlng)
