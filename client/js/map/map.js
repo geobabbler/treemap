@@ -136,8 +136,6 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.treeLayer = L.geoJson('', {
       onEachFeature: function(feature, layer) {
         layer.on('mouseover click', function(e) {
-          var iconContent = changeIcon(String(feature.properties.year));
-          console.log(iconContent)
           var hover_bubble = new L.Rrose({
               offset: new L.Point(0, -2),
               closeButton: false,
