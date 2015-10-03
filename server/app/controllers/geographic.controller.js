@@ -58,7 +58,6 @@ exports.showTrees = function(req, res, next) {
       }
       myQuery += ` GROUP BY common_nam, genus, species, year, geom, planted_by;`
 
-      console.log(myQuery)
       client.query(myQuery, function(err, result) {
 
         if (result.rowCount == 0) {

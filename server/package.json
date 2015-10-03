@@ -10,6 +10,7 @@
     "corser": "latest",
     "diskspace": "latest",
     "pg": "latest",
-    "babel": "latest"
+    "babel": "latest",
+    "babel-core": "latest"
   }
 }

@@ -1,15 +1,14 @@
 angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) {
-  var _this = this;
 
   this.showTrees = function(data) {
-    var defer = $q.defer();
+    var swX = String(data.bbox._southWest.lng),
+        swY = String(data.bbox._southWest.lat),
+        neX = String(data.bbox._northEast.lng),
+        neY = String(data.bbox._northEast.lat),
+        filter = data.filter;
 
-    var swX = data.bbox._southWest.lng,
-      swY = data.bbox._southWest.lat,
-      neX = data.bbox._northEast.lng,
-      neY = data.bbox._northEast.lat,
-      filter = data.filter;
     var sendFilter = [];
+
     for (var a in filter) {
       if (filter[a] === 'Before 2010') {
         sendFilter.push.apply(sendFilter, ['2009', '0', '2008']);
@@ -17,59 +16,55 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
         sendFilter.push(filter[a]);
       }
     }
-    $http.get('/api/geo/trees?neLat=' + String(neY) + '&neLng=' + String(neX) + '&swLat=' + String(swY) + '&swLng=' + String(swX) + '&filter=' + sendFilter)
-      .success(function(outData) {
-        defer.resolve(outData);
-      })
-      .error(function(e) {
-        defer.reject('could not find treedat');
-      });
 
-    return defer.promise;
+    return $http.get(`/api/geo/trees?neLat=${neY}&neLng=${neX}&swLat=${swY}&swLng=${swX}&filter=${sendFilter}`)
+      .then(function(response) {
+        return response.data;
+      });
   }
 
   this.showNeighborhoods = function(data) {
-    var defer = $q.defer();
-    var swX = data.bbox._southWest.lng,
-      swY = data.bbox._southWest.lat,
-      neX = data.bbox._northEast.lng,
-      neY = data.bbox._northEast.lat
-    zoomLev = data.zoomLev;
-    $http.get('/api/neighborhood?neLat=' + String(neY) + '&neLng=' + String(neX) + '&swLat=' + String(swY) + '&swLng=' + String(swX) + '&zoomLev=' + zoomLev)
-      .success(function(outData) {
-        defer.resolve(outData);
-      })
-      .error(function(e) {
-        defer.reject('could not find treedat');
-      });
+    var swX = String(data.bbox._southWest.lng),
+        swY = String(data.bbox._southWest.lat),
+        neX = String(data.bbox._northEast.lng),
+        neY = String(data.bbox._northEast.lat),
+        zoomLev = String(data.zoomLev);
 
-    return defer.promise;
+    return $http.get(`/api/neighborhood?neLat=${neY}&neLng=${neX}&swLat=${swY}&swLng=${swX}&zoomLev=${zoomLev}`)
+      .then(function(response){
+        return response.data;
+      });
   }
 
   this.getZoomNeighborhoods = function(data) {
-    var defer = $q.defer();
+    var searchString = String(data.val);
 
-    var searchString = data.val;
-    $http.get('/api/neighborhoodNames?searchString=' + String(searchString))
-      .success(function(outData) {
-        defer.resolve(outData);
-      })
-      .error(function(e) {
-        defer.reject('could not find treedat');
+    return $http.get(`/api/neighborhoodNames?searchString=${data}`)
+      .then(function(response){
+        return response.data;
       });
-
-    return defer.promise;
   }
 
-  this.clusterByReducedPrecision = function(data) {
-    var defer = $q.defer();
+  this.getSingleNeighborhoods = function(data) {
+    var data = String(data);
 
-    var swX = data.bbox._southWest.lng,
-      swY = data.bbox._southWest.lat,
-      neX = data.bbox._northEast.lng,
-      neY = data.bbox._northEast.lat,
-      filter = data.filter;
+    return $http.get(`/api/getSingleNeighborhood?neighborhood=${data}`)
+      .then(function(response){
+        return response.data;
+      });
+  }
+
+  /*TODO - Is this still being used?*/
+  this.clusterByReducedPrecision = function(data) {
+
+    var swX = String(data.bbox._southWest.lng),
+        swY = String(data.bbox._southWest.lat),
+        neX = String(data.bbox._northEast.lng),
+        neY = String(data.bbox._northEast.lat),
+        filter = data.filter;
+
     var sendFilter = [];
+
     for (var a in filter) {
       if (filter[a] === 'Before 2010') {
         sendFilter.push.apply(sendFilter, ['2009', '0', '2008']);
@@ -78,20 +73,11 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       }
     };
 
-    $http.get('/api/geo/clusterByReducedPrecision?neLat=' + String(neY) + '&neLng=' + String(neX) + '&swLat=' + String(swY) + '&swLng=' + String(swX) + '&filter=' + sendFilter)
-      .success(function(outData) {
-        defer.resolve(outData);
-      })
-      .error(function(e) {
-        defer.reject('could not find treedat');
+    return $http.get(`/api/geo/clusterByReducedPrecision?neLat=${neY}&neLng=${neX}&swLat=${swY}&swLng=${swX}&filter=${sendFilter}`)
+      .then(function(response){
+        return response.data;
       });
-
-    return defer.promise;
   }
 
-
-  this.helloWorld = function() {
-    return 'hello world!';
-  }
   return this;
 });

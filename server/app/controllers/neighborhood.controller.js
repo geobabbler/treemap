@@ -85,7 +85,7 @@ exports.neighborhoodNamesBBox = function(req, res, next) {
                 return true;
             };
 
-            var myQuery = `SELECT label, ST_AsGeoJSON(ST_Envelope(geom)) AS geom ` +
+            var myQuery = `SELECT label, gid, ST_AsGeoJSON(ST_Envelope(geom)) AS geom ` +
                           `FROM neighborhoodwgs84 ` +
                           `WHERE LOWER(label) LIKE LOWER('%${searchString}%') LIMIT 6;`
             client.query(myQuery, function(err, result) {
@@ -99,7 +99,8 @@ exports.neighborhoodNamesBBox = function(req, res, next) {
                   for(var i=0; i<result.rowCount; i++){
                     var feature = new Feature();
                     feature.properties = ({
-                        "label":result.rows[i].label
+                        "label":result.rows[i].label,
+                        "gid":result.rows[i].gid
                     })
                     feature.geometry = JSON.parse(result.rows[i].geom);
                     featureCollection.features.push(feature);
@@ -116,3 +117,47 @@ exports.neighborhoodNamesBBox = function(req, res, next) {
         //send failuer
     }
 }
+    exports.getSingleNeighborhood = function(req, res, next) {
+        var hoodName = req.query.neighborhood;
+        //if label is passed in
+        if(hoodName){
+            pg.connect(connstring, function(err, client, done) {
+                var handleError = function(err) {
+                    if(!err) return false;
+                    done(client);
+                    next(err);
+                    return true;
+                };
+
+                var myQuery = `SELECT label, gid, ST_AsGeoJSON(geom) AS geom ` +
+                              `FROM neighborhoodwgs84 ` +
+                              `WHERE gid = '${hoodName}';`
+                              console.log(myQuery)
+                client.query(myQuery, function(err, result) {
+                    // console.log(result.rowCount)
+                    if(result.rowCount == 0) {
+                      res.send(500);
+                    }
+                    else {
+                      var featureCollection = new FeatureCollection();
+                      var nbhdProps = new Array();
+                      for(var i=0; i<result.rowCount; i++){
+                        var feature = new Feature();
+                        feature.properties = ({
+                            "label":result.rows[i].label
+                        })
+                        feature.geometry = JSON.parse(result.rows[i].geom);
+                        featureCollection.features.push(feature);
+                      }
+                      res.type('text/javascript');
+                      res.jsonp(featureCollection);
+                      done();
+                    }
+                });
+            })
+
+        }
+        else{
+            //send failuer
+        }
+      }

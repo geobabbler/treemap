@@ -28,15 +28,15 @@
     <ul class="nav navbar-nav">
       <form class="navbar-form navbar-left">
         <button ng-click="toggleNeighborhoods();" class="btn btn-default" ng-class="{'active':neighborhoodButton}">
-          <span ng-hide="neighborhoodButton">Show Neighborhoods</span>
-          <span ng-show="neighborhoodButton">&nbsp;Hide Neighborhoods&nbsp;&nbsp;</span>
+          <span ng-hide="neighborhoodButton">Show All Neighborhoods</span>
+          <span ng-show="neighborhoodButton">&nbsp;Hide All Neighborhoods&nbsp;&nbsp;</span>
         </button>
         <!-- <a ng-click="toggleNeighborhoods();" style="padding-right: 3px;">Show Neighborhoods</a> -->
       </form>
       <li>
         <form class="navbar-form" role="search">
           <div class="form-group">
-            <input class="form-control" class="form-control" ng-model="neighborhoodNameSelected" placeholder="Go to Neighborhood" type="text" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="zoomToHood($item)" typeahead="address.properties.label for address in neighborhoodTextInput($viewValue)">
+            <input class="form-control" class="form-control" ng-model="neighborhoodNameSelected" placeholder="Filter by Neighborhood" type="text" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="zoomToHood($item)" typeahead="address.properties.label for address in neighborhoodTextInput($viewValue)">
             <i class="glyphicon glyphicon-refresh" ng-show="loadingLocations"></i>
             <div ng-show="noResults">
               <i class="glyphicon glyphicon-remove"></i>
@@ -46,6 +46,12 @@
 
         </form>
       </li>
+      <form class="navbar-form navbar-left" >
+        <button class="btn btn-danger" ng-hide="hideSingleNeighborhood" ng-click="toggleSingleNeighborood('null')">
+          <span >clear filter</span>
+        </button>
+        <!-- <a ng-click="toggleNeighborhoods();" style="padding-right: 3px;">Show Neighborhoods</a> -->
+      </form>
     </ul>
 
     <ul class="nav navbar-nav navbar-right hidden-xs">

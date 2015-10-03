@@ -5,6 +5,8 @@ module.exports = function(app) {
   // set up the routes themselves
   app.get("/api/neighborhood", neighborhoodController.neighborhoodByBounds);
   app.get("/api/neighborhoodNames", neighborhoodController.neighborhoodNamesBBox);
+  app.get("/api/getSingleNeighborhood", neighborhoodController.getSingleNeighborhood);
+
   app.get("/api/geo/trees", geoController.showTrees);
   app.get("/api/geo/clusterByReducedPrecision", geoController.clusterByReducedPrecision);
 

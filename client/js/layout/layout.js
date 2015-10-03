@@ -15,9 +15,10 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', '$
     $rootScope.$broadcast('zoomChange', zoomType);
   }
 
+  //when a user types in a neighborhood name, return a list of neighborhoods
+  //  with matching input string
   $scope.neighborhoodTextInput = function(val) {
-    return treeData.getZoomNeighborhoods({val:val}).then(function(response){
-        // return response;
+    return treeData.getZoomNeighborhoods(val).then(function(response){
       return response.features.map(function(item){
         return item;
       });
@@ -25,8 +26,33 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', '$
   };
 
   $scope.zoomToHood = function($item){
+
+
     var gotobounds = L.geoJson($item).getBounds();
     $scope.map.fitBounds(gotobounds);
+
+    $scope.toggleSingleNeighborood($item.properties.gid);
+  }
+
+  $scope.singleHood = L.geoJson('');
+  $scope.hideSingleNeighborhood = true;
+  $scope.toggleSingleNeighborood = function(neighborhoodGID){
+    //$item.properties.gid
+    if($scope.hideSingleNeighborhood){
+      treeData.getSingleNeighborhoods(neighborhoodGID).then(function(e){
+        $scope.singleHood.clearLayers();
+        $scope.singleHood.addData(e);
+        $scope.singleHood.addTo($scope.map);
+        $scope.singleHood.bringToBack();
+
+        $scope.hideSingleNeighborhood = false;
+      })
+    }
+    else {
+      $scope.singleHood.clearLayers();
+      $scope.hideSingleNeighborhood = true;
+    }
+
   }
 
   //listener events

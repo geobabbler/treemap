@@ -3,34 +3,40 @@ var mapStuff = angular.module('mapStuff', ['ngRoute']);
 mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
   function($scope, $rootScope, treeData) {
 
-    /*
-     * Defaults
-     */
+    /***************************************************************************
+     * Defaults and configs
+     ***************************************************************************/
 
     //Set default state for treeLayer to be turned off
     $scope.neighborhoodLayerVisible = false;
 
     // default map starts for this project TODO: seperate starts into config file
-    $scope.startX = 39.2847064,
-      $scope.startY = -76.6204859,
-      $scope.startZ = 16;
+    $scope.startX = 39.2847064;
+    $scope.startY = -76.6204859;
+    $scope.startZ = 16;
     $scope.maxBounds = L.latLngBounds(L.latLng(38.5, -77.2), L.latLng(39.8, -75.9));
 
-    /*
-     * Mapping / Leaflet parts
-     */
+    /***************************************************************************
+     * Mapping / Control parts
+    ***************************************************************************/
 
     // create map object, set view to be the default map starts
     $scope.map = L.map('map', {
-      'zoomControl': false,
+      zoomControl: false,
       maxBounds: $scope.maxBounds,
       minZoom: 12
     });
 
-    /*
-     * Layers
-     */
-    // two basemaps being included TODO: put some of these basemap options into config file, maybe array for basemap options
+    $rootScope.$on('zoomChange', function(e, d) {
+      if (d === 'zoomIn') {
+        $scope.map.zoomIn();
+      }
+      $scope.map.zoomOut();
+    });
+
+    /***************************************************************************
+     * Base Layers
+    ***************************************************************************/
     $scope.basemap = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       'maxZoom': 18,
       'attribution': 'mapbox/OSM',
@@ -45,32 +51,6 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       'accessToken': 'pk.eyJ1IjoiaG9nYW5tYXBzIiwiYSI6ImFhMDUxZWFkNDhkZjkzMTU3MmYwNjJhN2VjYmFhN2U4In0.89HZWfBDYycfNzm1LIq3LA'
     });
 
-    /*
-      this empty unstyled geojson feeds the clusters
-    */
-    // $scope.clusteredGeoJSON = L.geoJson('');
-
-    $scope.neighborhoodPolyStyle = function(feat) {
-      return {
-        // fillColor: '#7F9A65',
-        // weight: 2,
-        // opacity: 1,
-        color: '#7F9A65',
-        // fillOpacity: 0.7,
-        className: 'borders',
-        clickable: false
-      };
-    }
-
-    $scope.neighborhoodsLayer = L.geoJson('', {
-      onEachFeature: $scope.onEachFeature,
-      style: $scope.neighborhoodPolyStyle
-    }).addTo($scope.map);
-
-    /*
-     *	this section is for map events
-     */
-
     //when the user clicks the icon that toggles the basemap
     $rootScope.$on('baseLayerChange', function(e, d) {
       // TODO build off array of basemaps in config maybe?
@@ -84,16 +64,11 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     });
 
     //when the user clicks the zoom in and zoom out buttons
-    $rootScope.$on('zoomChange', function(e, d) {
-      if (d === 'zoomIn') {
-        $scope.map.zoomIn();
-      }
-      $scope.map.zoomOut();
-    });
 
-    /*
+
+    /***************************************************************************
     Tree Layer Control
-    */
+    ***************************************************************************/
 
     $scope.treeConfig = {
       "other": {
@@ -197,25 +172,25 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       }
     });
 
-    function groupingSize(count){
-      return count > 200  ? 22 :
-           count > 100  ? 18 :
-           count > 50   ? 14 :
-           count > 10   ? 10 :
-                      6;
+    function groupingSize(count) {
+      return count > 200 ? 22 :
+        count > 100 ? 18 :
+        count > 50 ? 14 :
+        count > 10 ? 10 :
+        6;
     }
 
     //empty layer for the trees
-$scope.treeNeighborhoodPoints = L.geoJson('', {
-  onEachFeature: function(feature, layer) {
-    layer.on('mouseover click', function(e) {
-      var hover_bubble = new L.Rrose({
-          offset: new L.Point(0, -2),
-          closeButton: false,
-          autoPan: false,
-          y_bounds: 149
-        })
-        .setContent(`<div class="row" style="text-align: center;">
+    $scope.treeNeighborhoodPoints = L.geoJson('', {
+      onEachFeature: function(feature, layer) {
+        layer.on('mouseover click', function(e) {
+          var hover_bubble = new L.Rrose({
+              offset: new L.Point(0, -2),
+              closeButton: false,
+              autoPan: false,
+              y_bounds: 149
+            })
+            .setContent(`<div class="row" style="text-align: center;">
           <i class="fa fa-leaf"></i>
           </div>
           <hr>
@@ -224,73 +199,72 @@ $scope.treeNeighborhoodPoints = L.geoJson('', {
           <b>trees here: </b>${String(feature.properties.count)}</br>
           </div>
           </div>`)
-        .setLatLng(e.latlng)
-        .openOn($scope.map);
+            .setLatLng(e.latlng)
+            .openOn($scope.map);
+        });
+        layer.on('mouseout', function(e) {
+          $scope.map.closePopup()
+        });
+      },
+      pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: groupingSize(feature.properties.count),
+          fillColor: '#66c2a4',
+          color: 'black',
+          weight: .5,
+          opacity: 1,
+          fillOpacity: 0.65
+        });
+      }
     });
-    layer.on('mouseout', function(e) {
-      $scope.map.closePopup()
-    });
-  },
-  pointToLayer: function(feature, latlng) {
-    return L.circleMarker(latlng, {
-      radius: groupingSize(feature.properties.count),
-      color: '#66c2a4',
-      weight: .5,
-      opacity: 1,
-      fillOpacity: 0.65
-    });
-  }
-});
-var layerGroup = new L.layerGroup();
-      $scope.treeNeighborhoodPie = function(data){
-        layerGroup.clearLayers()
 
-        for (var a in data.features) {
-          layerGroup.addLayer(new L.PieChartMarker(L.latLng(data.features[a].geometry.coordinates[1], data.features[a].geometry.coordinates[0]), {
-            data: {
-              'Before 2010': (data.features[a].properties.YRunkown + data.features[a].properties.YR2008 + data.features[a].properties.YR2009),
-              '2010': data.features[a].properties.YR2010,
-              '2011': data.features[a].properties.YR2011,
-              '2012': data.features[a].properties.YR2012,
-              '2013': data.features[a].properties.YR2013
+    var layerGroup = new L.layerGroup();
+
+    $scope.treeNeighborhoodPie = function(data) {
+      layerGroup.clearLayers()
+
+      for (var a in data.features) {
+        layerGroup.addLayer(new L.PieChartMarker(L.latLng(data.features[a].geometry.coordinates[1], data.features[a].geometry.coordinates[0]), {
+          data: {
+            'Before 2010': (data.features[a].properties.YRunkown + data.features[a].properties.YR2008 + data.features[a].properties.YR2009),
+            '2010': data.features[a].properties.YR2010,
+            '2011': data.features[a].properties.YR2011,
+            '2012': data.features[a].properties.YR2012,
+            '2013': data.features[a].properties.YR2013
+          },
+          chartOptions: {
+            'Before 2010': {
+              fillColor: $scope.treeConfig["other"].color,
+              color: 'black'
             },
-            chartOptions: {
-              'Before 2010': {
-                fillColor: $scope.treeConfig["other"].color,
-                color: 'black'
-              },
-              '2010': {
-                fillColor: $scope.treeConfig["2010"].color,
-                color: 'black'
-              },
-              '2011': {
-                fillColor: $scope.treeConfig["2011"].color,
-                color: 'black'
-              },
-              '2012': {
-                fillColor: $scope.treeConfig["2012"].color,
-                color: 'black'
-              },
-              '2013': {
-                fillColor: $scope.treeConfig["2013"].color,
-                color: 'black'
-              }
+            '2010': {
+              fillColor: $scope.treeConfig["2010"].color,
+              color: 'black'
             },
-            fill: true,
-            weight: .5,
-            fillOpacity: 1,
-            radius: groupingSize(data.features[a].properties.count) + 5,
-            barThickness: 5,
-            gradient: false,
-            highlight: false,
-            tooltipOptions: {
-              showTooltips: false
+            '2011': {
+              fillColor: $scope.treeConfig["2011"].color,
+              color: 'black'
+            },
+            '2012': {
+              fillColor: $scope.treeConfig["2012"].color,
+              color: 'black'
+            },
+            '2013': {
+              fillColor: $scope.treeConfig["2013"].color,
+              color: 'black'
             }
-          })
-        ).addTo($scope.map);
+          },
+          fill: true,
+          weight: .5,
+          fillOpacity: 1,
+          radius: groupingSize(data.features[a].properties.count) + 5,
+          barThickness: 5,
+          gradient: false,
+          highlight: false
+        })).addTo($scope.map);
 
-        }
-      };
+      }
+    };
 
     //function to draw the trees
     $scope.drawTrees = function() {
@@ -346,6 +320,7 @@ var layerGroup = new L.layerGroup();
           bbox: $scope.map.getBounds(),
           filter: $scope.disabledYearArray
         }).then(function(data) {
+          console.log(data)
           $scope.treeLayer.clearLayers();
           $rootScope.$broadcast('treeCount', data.total);
           try {
@@ -374,9 +349,21 @@ var layerGroup = new L.layerGroup();
 
         }, function(err) {
           //failure!
+          console.log(err)
         });
       }
     };
+
+    $scope.neighborhoodsLayer = L.geoJson('', {
+      style: function(feature) {
+        return {
+          color: '#7F9A65',
+          className: 'borders',
+          clickable: false
+        }
+      }
+    });
+
 
     $scope.neighborhoods = function() {
       //neighborhood button clicked
@@ -387,13 +374,12 @@ var layerGroup = new L.layerGroup();
         }).then(function(data) {
           $scope.neighborhoodsLayer.clearLayers();
           $scope.neighborhoodsLayer.addData(data);
+          $scope.neighborhoodsLayer.addTo($scope.map);
           $scope.neighborhoodsLayer.bringToBack();
         }, function(err) {
           console.log(err);
-          //failure!
         });
       } else {
-        //
         $scope.neighborhoodsLayer.clearLayers();
       }
     }
@@ -432,40 +418,16 @@ var layerGroup = new L.layerGroup();
 
     //push and splice tree year labels in and out of the array
     $scope.toggleTreeYear = function(year) {
-
-        if (indexOf.call($scope.disabledYearArray, year) === -1) {
-          //ensures at least one year filter is on at all times
-          if($scope.disabledYearArray.length < 4){
-            $scope.disabledYearArray.push(year);
-          }
-        } else {
-          $scope.disabledYearArray.splice(indexOf.call($scope.disabledYearArray, year), 1);
+      if (indexOf.call($scope.disabledYearArray, year) === -1) {
+        //ensures at least one year filter is on at all times
+        if ($scope.disabledYearArray.length < 4) {
+          $scope.disabledYearArray.push(year);
         }
-        $scope.drawTrees();
+      } else {
+        $scope.disabledYearArray.splice(indexOf.call($scope.disabledYearArray, year), 1);
+      }
+      $scope.drawTrees();
     }
-
-    function getSize(d) {
-      return d >= 40 ? 20 :
-        d >= 21 ? 15 :
-        d >= 6 ? 10 :
-        d >= 1 ? 4 :
-        0;
-    }
-
-    // $scope.showClusterByReducedPrecisionLayer = L.geoJson('', {
-    //   pointToLayer: function(feature, latlng) {
-    //     return L.circleMarker(latlng, {
-    //       radius: getSize(feature.properties.count),
-    //       fillColor: "#ff7800",
-    //       color: "#000",
-    //       weight: 1,
-    //       opacity: 1,
-    //       fillOpacity: 0.8
-    //     }).addTo($scope.map);
-    //   }
-    // }).addTo($scope.map);
-    // $scope.showClusterByReducedPrecision = false;
-
 
     $scope.map.on('moveend', $scope.drawTrees);
     $scope.map.on('load', $scope.drawTrees);

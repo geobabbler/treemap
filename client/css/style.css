@@ -157,3 +157,7 @@ div.container-fluid {
 	background-image: none;
 	vertical-align: text-bottom;
 }
+
+.leaflet-marker-pane {
+  display: none;
+}
