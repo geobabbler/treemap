@@ -5,7 +5,14 @@ var pg = require('pg');
 var env = require('../../config/env.js'),
     environment = new env(),
     connstring = environment.connstring;
-
+var cfg = {
+    user: environment.user,
+    password: environment.password,
+    database: environment.database,
+    port: environment.pgport,
+    host: environment.host,
+    hostname: environment.hostname
+};
 /*
 this makes geojson output possible
 */
@@ -31,7 +38,7 @@ exports.neighborhoodByBounds = function(req, res, next) {
       swY = req.query.swLng,
       zoomLev = req.query.zoomLev;
 
-    pg.connect(connstring, function(err, client, done) {
+    pg.connect(cfg, function(err, client, done) {
         var handleError = function(err) {
             if(!err) return false;
             done(client);
@@ -48,8 +55,9 @@ exports.neighborhoodByBounds = function(req, res, next) {
         var myQuery = `SELECT label, id, ST_AsGeoJSON(ST_SimplifyPreserveTopology(geom, ${tolerance})) AS geom `+
                       `FROM neighborhoodwgs84 ` +
                       `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ));`
-
+console.log(myQuery);
         client.query(myQuery, function(err, result) {
+console.log(err);
             if(result.rowCount == 0) {
               res.send(500);
             }
@@ -77,7 +85,7 @@ exports.neighborhoodNamesBBox = function(req, res, next) {
     var searchString = req.query.searchString;
     //if label is passed in
     if(searchString){
-        pg.connect(connstring, function(err, client, done) {
+        pg.connect(cfg, function(err, client, done) {
             var handleError = function(err) {
                 if(!err) return false;
                 done(client);
@@ -121,7 +129,7 @@ exports.neighborhoodNamesBBox = function(req, res, next) {
         var hoodName = req.query.neighborhood;
         //if label is passed in
         if(hoodName){
-            pg.connect(connstring, function(err, client, done) {
+            pg.connect(cfg, function(err, client, done) {
                 var handleError = function(err) {
                     if(!err) return false;
                     done(client);

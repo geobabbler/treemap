@@ -10,7 +10,15 @@ var pg = require('pg');
 var env = require('../../config/env.js'),
   environment = new env(),
   connstring = environment.connstring;
-
+var cfg = {
+   user: environment.user,
+   database: environment.database,
+   password: environment.password,
+   port: environment.pgport,
+   host: environment.host,
+   hostname: environment.hostname,
+};
+console.log(cfg);
 /*
 this makes geojson output possible
 */
@@ -40,7 +48,9 @@ exports.showTrees = function(req, res, next) {
 
   //if the bounding box has three values come in on param...
   if (neX && neY && swX && swY) {
-    pg.connect(connstring, function(err, client, done) {
+    pg.connect(cfg, function(err, client, done) {
+      console.log(connstring);
+      console.log(err);
       var handleError = function(err) {
         if (!err) return false;
         done(client);
@@ -57,9 +67,9 @@ exports.showTrees = function(req, res, next) {
         myQuery += ` and year::int != all (array[${filter}])`
       }
       myQuery += ` GROUP BY common_nam, genus, species, year, geom, planted_by;`
-
+console.log(myQuery);
       client.query(myQuery, function(err, result) {
-
+console.log(err);
         if (result.rowCount == 0) {
           res.send(500);
         } else {
@@ -98,7 +108,7 @@ exports.clusterByReducedPrecision = function(req, res, next) {
     swY = req.query.swLng,
     filter = req.query.filter;
   //if the bounding box has three values come in on param...
-  pg.connect(connstring, function(err, client, done) {
+  pg.connect(cfg, function(err, client, done) {
     var handleError = function(err) {
       if (!err) return false;
       done(client);
@@ -122,6 +132,7 @@ exports.clusterByReducedPrecision = function(req, res, next) {
             FROM tree_plantingswgs84
             WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))
           `;
+console.log(myQuery);
           if (filter) {
             myQuery += ` and year::int != all (array[${filter}])`
           }

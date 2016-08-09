@@ -8,7 +8,7 @@ module.exports = function (app, config) {
 	
 	//setting up static directory to serve up static site from the public dir off root.
 	app.use('/', express.static(__dirname + '../../../client'));
-	
+console.log(__dirname);	
 	//enable cross domain access everywhere!
 	app.use(corser.create());
 	
