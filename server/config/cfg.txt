@@ -1,0 +1,10 @@
+module.exports = function () {
+	this.port = 80;
+	this.connstring = 'postgres://treebaltimore:34erdfcv#$ERDFCV@localhost:5432/treebaltimore';
+        this.user = 'treebaltimore';
+        this.database = 'treebaltimore';
+        this.pgport = 5432;
+        this.password = '34erdfcv#$ERDFCV';
+        this.host = 'localhost';
+        this.hostname = 'localhost';
+}
