@@ -38,13 +38,14 @@ object for tables
 */
 
 exports.showTrees = function(req, res, next) {
+  console.log('hi');
   var neX = req.query.neLat,
     neY = req.query.neLng,
     swX = req.query.swLat,
     swY = req.query.swLng,
     filter = req.query.filter;
 
-
+console.log("here");
 
   //if the bounding box has three values come in on param...
   if (neX && neY && swX && swY) {
@@ -59,14 +60,14 @@ exports.showTrees = function(req, res, next) {
       };
 
       // if(!filter){
-      var myQuery = `SELECT common_nam, genus, species, year, planted_by, ST_AsGeoJSON(geom) AS geography, count(year) AS total ` +
+      var myQuery = `SELECT common_nam, genus, species, year, planted_by, neighborhoodname, ST_AsGeoJSON(geom) AS geography, count(year) AS total ` +
                     `FROM tree_plantingswgs84 ` +
                     `WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))`
 
       if (filter) {
         myQuery += ` and year::int != all (array[${filter}])`
       }
-      myQuery += ` GROUP BY common_nam, genus, species, year, geom, planted_by;`
+      myQuery += ` GROUP BY common_nam, genus, species, year, geom, planted_by, neighborhoodname;`
 console.log(myQuery);
       client.query(myQuery, function(err, result) {
 console.log(err);
@@ -82,8 +83,10 @@ console.log(err);
               "species": result.rows[i].species === null ? "unknown" : result.rows[i].species,
               "year": parseInt(result.rows[i].year),
               "planted_by": result.rows[i].planted_by === null ? "unknown" : result.rows[i].planted_by,
+              "neighborhoodname": result.rows[i].neighborhoodname === null ? "unknown" : result.rows[i].neighborhoodname,
               "total": result.rows[i].total
             })
+            console.log(JSON.stringify(feature));
             feature.geometry = JSON.parse(result.rows[i].geography);
             featureCollection.features.push(feature);
           }

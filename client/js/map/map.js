@@ -8,11 +8,11 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
      ***************************************************************************/
 
     //Set default state for treeLayer to be turned off
-    $scope.neighborhoodLayerVisible = false;
+    $scope.neighborhoodLayerVisible = true;
 
     // default map starts for this project TODO: seperate starts into config file
-    $scope.startX = 39.2847064;
-    $scope.startY = -76.6204859;
+    $scope.startX = 39.286012;
+    $scope.startY = -76.609674;
     $scope.startZ = 16;
     $scope.maxBounds = L.latLngBounds(L.latLng(38.5, -77.2), L.latLng(39.8, -75.9));
 
@@ -118,16 +118,17 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
               y_bounds: 149
             })
             .setContent('<div class="row" style="text-align: center;">' +
-              `<i class="fa fa-leaf"></i>` +
+              '<i class="fa fa-leaf"></i>' +
               '</div>' +
               '<hr>' +
               '<div class="row">' +
-              `<b>plant year: </b>${String(feature.properties.year)}</br>` +
-              `<b>trees here: </b>${String(feature.properties.total)}</br>` +
-              `<b>planting org: </b>${String(feature.properties.planted_by)}</br>` +
-              `<b>common name: </b>${feature.properties.common_name}</br>` +
-              `<b>genus: </b>${feature.properties.genus}</br>` +
-              `<b>species: </b>${feature.properties.species}` +
+              '<b>plant year: </b>' + feature.properties.year + '</br>' +
+              '<b>trees here: </b>' + feature.properties.total + '</br>' +
+              '<b>planting org: </b>' + feature.properties.planted_by + '</br>' +
+              '<b>common name: </b>' + feature.properties.common_name + '</br>' +
+              '<b>genus: </b>' +feature.properties.genus + '</br>' +
+              '<b>species: </b>' + feature.properties.species + '</br>' +
+              '<b>neighborhood: </b>' + feature.properties.neighborhoodname + '</br>' +
               '</div>' +
               '</div>')
             .setLatLng(e.latlng)
@@ -190,15 +191,15 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
               autoPan: false,
               y_bounds: 149
             })
-            .setContent(`<div class="row" style="text-align: center;">
-          <i class="fa fa-leaf"></i>
-          </div>
-          <hr>
-          <div class="row">
-          <b>${String(feature.properties.neighborhood)}</b></br>
-          <b>trees here: </b>${String(feature.properties.count)}</br>
-          </div>
-          </div>`)
+            .setContent('<div class="row" style="text-align: center;">' +
+          '<i class="fa fa-leaf"></i>' +
+          '</div>' +
+          '<hr>' +
+          '<div class="row">' +
+          '<b>' + feature.properties.neighborhood + '</b></br>' +
+          '<b>trees here: </b>' + feature.properties.count + '</br>' +
+          '</div>' +
+          '</div>')
             .setLatLng(e.latlng)
             .openOn($scope.map);
         });

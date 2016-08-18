@@ -21,15 +21,15 @@
       <span class="sr-only">Zoom Out</span>
       <span class="fa fa-minus fa-6"></span>
     </button>
-    <a class="navbar-brand" ng-click="aboutModal();">{{projectName}}</a>
+    <a class="navbar-brand" ng-click="aboutModal();"><span style="font-weight: bold; color: #248920">Tree</span>Baltimore</a>
   </div>
 <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse" collapse="navCollapsed">
     <ul class="nav navbar-nav">
       <form class="navbar-form navbar-left">
         <button ng-click="toggleNeighborhoods();" class="btn btn-default" ng-class="{'active':neighborhoodButton}">
-          <span ng-hide="neighborhoodButton">Show All Neighborhoods</span>
-          <span ng-show="neighborhoodButton">&nbsp;Hide All Neighborhoods&nbsp;&nbsp;</span>
+          <span ng-show="neighborhoodButton">Show All Neighborhoods</span>
+          <span ng-hide="neighborhoodButton">&nbsp;Hide All Neighborhoods&nbsp;&nbsp;</span>
         </button>
         <!-- <a ng-click="toggleNeighborhoods();" style="padding-right: 3px;">Show Neighborhoods</a> -->
       </form>

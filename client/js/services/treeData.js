@@ -17,7 +17,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       }
     }
 
-    return $http.get(`/api/geo/trees?neLat=${neY}&neLng=${neX}&swLat=${swY}&swLng=${swX}&filter=${sendFilter}`)
+    return $http.get('/api/geo/trees?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&filter=' + sendFilter)
       .then(function(response) {
         return response.data;
       });
@@ -30,7 +30,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
         neY = String(data.bbox._northEast.lat),
         zoomLev = String(data.zoomLev);
 
-    return $http.get(`/api/neighborhood?neLat=${neY}&neLng=${neX}&swLat=${swY}&swLng=${swX}&zoomLev=${zoomLev}`)
+    return $http.get('/api/neighborhood?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&zoomLev=' + zoomLev)
       .then(function(response){
         return response.data;
       });
@@ -39,7 +39,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
   this.getZoomNeighborhoods = function(data) {
     var searchString = String(data.val);
 
-    return $http.get(`/api/neighborhoodNames?searchString=${data}`)
+    return $http.get('/api/neighborhoodNames?searchString=' + data)
       .then(function(response){
         return response.data;
       });
@@ -48,7 +48,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
   this.getSingleNeighborhoods = function(data) {
     var data = String(data);
 
-    return $http.get(`/api/getSingleNeighborhood?neighborhood=${data}`)
+    return $http.get('/api/getSingleNeighborhood?neighborhood=' + data)
       .then(function(response){
         return response.data;
       });
@@ -73,7 +73,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       }
     };
 
-    return $http.get(`/api/geo/clusterByReducedPrecision?neLat=${neY}&neLng=${neX}&swLat=${swY}&swLng=${swX}&filter=${sendFilter}`)
+    return $http.get('/api/geo/clusterByReducedPrecision?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&filter=' + sendFilter)
       .then(function(response){
         return response.data;
       });
