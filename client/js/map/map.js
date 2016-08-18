@@ -24,8 +24,12 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.map = L.map('map', {
       zoomControl: false,
       maxBounds: $scope.maxBounds,
+      attributionControl: false,
       minZoom: 12
     });
+
+    var attrib = L.control.attribution({position: 'bottomright', prefix: false}).addAttribution('<img src="logo.png" style="display:block; margin: auto; width: 40%; height: 40%;"/><br/><a href="http://leafletjs.com" target="_blank">Leaflet</a> | <span style="font-weight: bold; color: #248920">Tree</span>Baltimore, Mapbox, OSM');
+    attrib.addTo($scope.map);
 
     $rootScope.$on('zoomChange', function(e, d) {
       if (d === 'zoomIn') {
@@ -39,14 +43,14 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     ***************************************************************************/
     $scope.basemap = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       'maxZoom': 18,
-      'attribution': 'mapbox/OSM',
+      //'attribution': 'mapbox/OSM',
       'id': 'mapbox.outdoors',
       'accessToken': 'pk.eyJ1IjoiaG9nYW5tYXBzIiwiYSI6ImFhMDUxZWFkNDhkZjkzMTU3MmYwNjJhN2VjYmFhN2U4In0.89HZWfBDYycfNzm1LIq3LA'
     }).addTo($scope.map);
 
     $scope.satellite = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       'maxZoom': 18,
-      'attribution': 'mapbox/OSM',
+      //'attribution': 'mapbox/OSM',
       'id': 'mapbox.satellite',
       'accessToken': 'pk.eyJ1IjoiaG9nYW5tYXBzIiwiYSI6ImFhMDUxZWFkNDhkZjkzMTU3MmYwNjJhN2VjYmFhN2U4In0.89HZWfBDYycfNzm1LIq3LA'
     });
