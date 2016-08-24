@@ -126,13 +126,13 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
               '</div>' +
               '<hr>' +
               '<div class="row">' +
-              '<b>plant year: </b>' + feature.properties.year + '</br>' +
-              '<b>trees here: </b>' + feature.properties.total + '</br>' +
-              '<b>planting org: </b>' + feature.properties.planted_by + '</br>' +
-              '<b>common name: </b>' + feature.properties.common_name + '</br>' +
-              '<b>genus: </b>' +feature.properties.genus + '</br>' +
-              '<b>species: </b>' + feature.properties.species + '</br>' +
-              '<b>neighborhood: </b>' + feature.properties.neighborhoodname + '</br>' +
+              '<b>Plant Year: </b>' + feature.properties.year + '</br>' +
+              '<b>Trees Here: </b>' + feature.properties.total + '</br>' +
+              '<b>Planting Org: </b>' + feature.properties.planted_by + '</br>' +
+              '<b>Common Name: </b>' + feature.properties.common_name + '</br>' +
+              '<b>Genus: </b>' +feature.properties.genus + '</br>' +
+              '<b>Species: </b>' + feature.properties.species + '</br>' +
+              '<b>Neighborhood: </b>' + feature.properties.neighborhoodname + '</br>' +
               '</div>' +
               '</div>')
             .setLatLng(e.latlng)
@@ -201,7 +201,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
           '<hr>' +
           '<div class="row">' +
           '<b>' + feature.properties.neighborhood + '</b></br>' +
-          '<b>trees here: </b>' + feature.properties.count + '</br>' +
+          '<b>Trees Here: </b>' + feature.properties.count + '</br>' +
           '</div>' +
           '</div>')
             .setLatLng(e.latlng)
