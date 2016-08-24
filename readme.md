@@ -1,13 +1,13 @@
 ###Getting Started
 
-for current example/to see progress, go to http://treemap.hogan.io/
+for current example/to see progress, go to http://192.81.216.203/
 
 to deploy:
 
-1. clone this repo down. make sure you have npm install and nodejs on your system
-2. In the project root - `sudo npm install`
-3. go in to the client repo `cd server`, and `sudo npm install -g bower` then `bower install`
-4. go back to the root project leve `cd ..` and run the index.js file `node server/server.js`. This has babel on-the-fly convert the backend files, which some files contain es2015, to es5.
+1. clone this repo down. make sure you have npm install and nodejs on your system (currently verified with node 5.4.0)
+2. From the project root - `cd server` then `sudo npm install`
+3. From the project root - `cd client`, `sudo npm install -g bower`, then `bower install`
+4. go back to the root project level and run `node server/server.js`. This has babel on-the-fly convert the backend files, which some files contain es2015, to es5.
 
 This app is running on a digital ocean 512mb droplet. The node backend is the API and hosts the static front end angular app
 
