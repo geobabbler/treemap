@@ -46,6 +46,21 @@
 
         </form>
       </li>
+      <li>
+        <form class="navbar-form">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Find by Address" id="addy" ng-model="addressVar">
+            <button ng-click='geocode(addressVar)'' class="btn btn-default">
+              <span>Go!</span>
+            </button>
+            <i class="glyphicon glyphicon-refresh" ng-show="loadingLocations"></i>
+            <div ng-show="noResults">
+              <i class="glyphicon glyphicon-remove"></i>
+              No Results Found
+            </div>
+          </div>
+        </form>
+      </li>
       <form class="navbar-form navbar-left" >
         <button class="btn btn-danger" ng-hide="hideSingleNeighborhood" ng-click="toggleSingleNeighborood('null')">
           <span >clear filter</span>

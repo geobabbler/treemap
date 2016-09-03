@@ -434,6 +434,25 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       $scope.neighborhoods();
     }
 
+    $scope.geocode = function(item) {
+      var o = treeData.geocode(item, function(data){
+          var x = data;
+          var y = JSON.parse(x.data);
+          var z= JSON.parse(y); //I don't know why I need to unroll it twice
+          if(z.candidates.length > 0)
+          {
+            var candidate = z.candidates[0];
+            var lx = candidate.location.x;
+            var ly = candidate.location.y;
+            $scope.map.panTo(new L.LatLng(ly, lx));
+          }
+          else{alert("We couldn't find your address");}
+      });
+      
+      //$scope.items.push(item);
+      //$scope.newItem = { title: '' }; // set newItem to a new object to lose the reference
+    }
+
     //empty array to push hidden tree years in to
     $scope.disabledYearArray = [];
 

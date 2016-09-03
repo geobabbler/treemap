@@ -61,6 +61,19 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       });
   }
 
+  this.geocode = function(data, callback){
+    var d = String(data);
+    var r = $http.get('/api/geo/address?address=' + data)
+      .then(function(response){
+        callback(response);
+      });
+          //$http.get('/api/geo/address?address='+item);
+      //alert(o);
+      //$scope.items.push(item);
+      //$scope.newItem = { title: '' }; // set newItem to a new object to lose the reference
+    //}
+  }
+
   /*TODO - Is this still being used?*/
   this.clusterByReducedPrecision = function(data) {
 

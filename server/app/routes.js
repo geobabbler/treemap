@@ -8,6 +8,7 @@ module.exports = function(app) {
   app.get("/api/getSingleNeighborhood", neighborhoodController.getSingleNeighborhood);
 
   app.get("/api/geo/trees", geoController.showTrees);
+  app.get("/api/geo/address", geoController.getAddress);
   app.get("/api/geo/clusterByReducedPrecision", geoController.clusterByReducedPrecision);
 
   app.get("/api/stats/trees", geoController.showTrees);

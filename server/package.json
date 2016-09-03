@@ -11,6 +11,7 @@
     "diskspace": "latest",
     "pg": "latest",
     "babel": "latest",
-    "babel-core": "latest"
+    "babel-core": "latest",
+    "request": "2.74.0"
   }
 }

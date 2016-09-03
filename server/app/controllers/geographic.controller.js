@@ -36,6 +36,18 @@ function Feature() {
 /*
 object for tables
 */
+exports.getAddress = function(req, res, next) {
+  var request = require('request');
+  var addy = req.query.address;
+  var url = `https://gis.baltimorecity.gov/egis/rest/services/locator/New_ADDRDB_ALIAS_WGS84_Combo/GeocodeServer/findAddressCandidates?Street=${addy}&SingleLine=&category=&outFields=&maxLocations=&outSR=4326&searchExtent=&location=&distance=&magicKey=&f=pjson`;
+  request(url, function (error, response, body) {
+  if (!error && response.statusCode == 200) {
+    res.type('text/javascript');
+    res.jsonp(body);
+    //done();
+  }
+  });
+}
 
 exports.showTrees = function(req, res, next) {
   console.log('hi');
