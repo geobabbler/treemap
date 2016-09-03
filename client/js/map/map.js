@@ -6,7 +6,27 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     /***************************************************************************
      * Defaults and configs
      ***************************************************************************/
+    var year0 = 2013; //new Date().getFullYear();
+    var year1 = year0 - 1;
+    var year2 = year1 - 1;
+    var year3 = year2 - 1;
+    var year4 = year3 - 1;
 
+    /*function getQueryParams(qs) {
+      qs = qs.split('+').join(' ');
+
+      var params = {},
+          tokens,
+          re = /[?&]?([^=]+)=([^&]*)/g;
+
+      while (tokens = re.exec(qs)) {
+          params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+      }
+
+      return params;
+    }
+
+    var q = getQueryParams(window.location.search);*/
     //Set default state for treeLayer to be turned off
     $scope.neighborhoodLayerVisible = true;
 
@@ -77,31 +97,31 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     $scope.treeConfig = {
       "other": {
         "order": 5,
-        "label": "Before 2010",
+        "label": "Before " + year3.toString(),
         "color": "#edf8fb",
         "count": 0
       },
       "2010": {
         "order": 4,
-        "label": "2010",
+        "label": year3.toString(),
         "color": "#b2e2e2",
         "count": 0
       },
       "2011": {
         "order": 3,
-        "label": "2011",
+        "label": year2.toString(),
         "color": "#66c2a4",
         "count": 0
       },
       "2012": {
         "order": 2,
-        "label": "2012",
+        "label": year1.toString(),
         "color": "#2ca25f",
         "count": 0
       },
       "2013": {
         "order": 1,
-        "label": "2013",
+        "label": year0.toString(),
         "color": "#006d2c",
         "count": 0
       }
@@ -110,6 +130,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
     function pointSize(data) {
       return 8 + (data / 15);
     }
+
 
     //empty layer for the trees
     $scope.treeLayer = L.geoJson('', {
@@ -144,19 +165,19 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       },
       style: function(feature) {
         switch (String(feature.properties.year)) {
-          case "2013":
+          case year0.toString():
             return {
               fillColor: $scope.treeConfig["2013"].color
             };
-          case "2012":
+          case year1.toString():
             return {
               fillColor: $scope.treeConfig["2012"].color
             };
-          case "2011":
+          case year2.toString():
             return {
               fillColor: $scope.treeConfig["2011"].color
             };
-          case "2010":
+          case year3.toString():
             return {
               fillColor: $scope.treeConfig["2010"].color
             };
@@ -278,7 +299,8 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
       if ($scope.map.getZoom() >= 15) {
         treeData.showTrees({
           bbox: $scope.map.getBounds(),
-          filter: $scope.disabledYearArray
+          filter: $scope.disabledYearArray,
+          baseyear: year0
         }).then(function(data) {
           var total = 0;
           data.features.forEach(function(d) {
@@ -296,13 +318,31 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
             $scope.treeConfig[item].count = 0;
           };
           for (var key in data.features) {
-
-            if ($scope.treeConfig[data.features[key].properties.year]) {
-              $scope.treeConfig[data.features[key].properties.year].count += 1;
-            }
-            if (!$scope.treeConfig[data.features[key].properties.year]) {
-              $scope.treeConfig["other"].count += 1;
-            }
+            var yr = data.features[key].properties.year;
+            var leaf = "";
+            switch (yr.toString()) {
+              case year0.toString():
+                leaf = "2013";
+                break;
+              case year1.toString():
+                leaf = "2012";
+                break;
+              case year2.toString():
+                leaf = "2011";
+                break;
+              case year3.toString():
+                leaf = "2010";
+                break;
+              default:
+                leaf = "other";
+          }
+            $scope.treeConfig[leaf].count += 1;
+            //if ($scope.treeConfig[data.features[key].properties.year]) {
+            //  $scope.treeConfig[data.features[key].properties.year].count += 1;
+            //}
+            //if (!$scope.treeConfig[data.features[key].properties.year]) {
+            //  $scope.treeConfig["other"].count += 1;
+            //}
           }
 
           $scope.treeLayer.clearLayers();
@@ -344,7 +384,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
           };
           for (var key in data.features) {
             //other (unkown, 2008, 2009)
-            $scope.treeConfig['other'].count += (data.features[key].properties.YRunkown + data.features[key].properties.YR2008 + data.features[key].properties.YR2009)
+            $scope.treeConfig['other'].count += data.features[key].properties.YR2009 //(data.features[key].properties.YRunkown + data.features[key].properties.YR2008 + data.features[key].properties.YR2009)
 
             $scope.treeConfig['2010'].count += data.features[key].properties.YR2010
             $scope.treeConfig['2011'].count += data.features[key].properties.YR2011
@@ -423,6 +463,7 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
     //push and splice tree year labels in and out of the array
     $scope.toggleTreeYear = function(year) {
+      //alert(year);
       if (indexOf.call($scope.disabledYearArray, year) === -1) {
         //ensures at least one year filter is on at all times
         if ($scope.disabledYearArray.length < 4) {

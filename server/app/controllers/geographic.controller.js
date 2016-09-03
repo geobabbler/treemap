@@ -43,7 +43,12 @@ exports.showTrees = function(req, res, next) {
     neY = req.query.neLng,
     swX = req.query.swLat,
     swY = req.query.swLng,
-    filter = req.query.filter;
+    filter = req.query.filter,
+    baseyear = req.query.baseyear;
+
+if(baseyear){
+    console.log("Base year: " + baseyear);
+}
 
 console.log("here");
 
@@ -70,7 +75,7 @@ console.log("here");
       myQuery += ` GROUP BY common_nam, genus, species, year, geom, planted_by, neighborhoodname;`
 console.log(myQuery);
       client.query(myQuery, function(err, result) {
-console.log(err);
+//console.log(err);
         if (result.rowCount == 0) {
           res.send(500);
         } else {
@@ -86,7 +91,7 @@ console.log(err);
               "neighborhoodname": result.rows[i].neighborhoodname === null ? "unknown" : result.rows[i].neighborhoodname,
               "total": result.rows[i].total
             })
-            console.log(JSON.stringify(feature));
+            //console.log(JSON.stringify(feature));
             feature.geometry = JSON.parse(result.rows[i].geography);
             featureCollection.features.push(feature);
           }
@@ -109,7 +114,8 @@ exports.clusterByReducedPrecision = function(req, res, next) {
     neY = req.query.neLng,
     swX = req.query.swLat,
     swY = req.query.swLng,
-    filter = req.query.filter;
+    filter = req.query.filter,
+    baseyear = parseInt(req.query.baseyear);
   //if the bounding box has three values come in on param...
   pg.connect(cfg, function(err, client, done) {
     var handleError = function(err) {
@@ -119,19 +125,23 @@ exports.clusterByReducedPrecision = function(req, res, next) {
       return true;
     };
 
-
+    var year0 = baseyear; //new Date().getFullYear();
+    var year1 = year0 - 1;
+    var year2 = year1 - 1;
+    var year3 = year2 - 1;
+    var year4 = year3 - 1;
 
           var myQuery = `
             SELECT ST_AsGeoJSON(ST_Centroid(ST_Collect(geom))) AS geography,
             	neighborhoodname,
             	count(year) AS total,
             	sum(case when year::int = 0 then 1 else 0 end) AS unkownyr,
-            	sum(case when year::int = 2008 then 1 else 0 end) AS yr2008,
-            	sum(case when year::int = 2009 then 1 else 0 end) AS yr2009,
-            	sum(case when year::int = 2010 then 1 else 0 end) AS yr2010,
-            	sum(case when year::int = 2011 then 1 else 0 end) AS yr2011,
-            	sum(case when year::int = 2012 then 1 else 0 end) AS yr2012,
-            	sum(case when year::int = 2013 then 1 else 0 end) AS yr2013
+            	sum(case when year::int < 2008 then 1 else 0 end) AS yr2008,
+            	sum(case when year::int < ${year3} then 1 else 0 end) AS yr2009,
+            	sum(case when year::int = ${year3} then 1 else 0 end) AS yr2010,
+            	sum(case when year::int = ${year2} then 1 else 0 end) AS yr2011,
+            	sum(case when year::int = ${year1} then 1 else 0 end) AS yr2012,
+            	sum(case when year::int = ${year0} then 1 else 0 end) AS yr2013
             FROM tree_plantingswgs84
             WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))
           `;

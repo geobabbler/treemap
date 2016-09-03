@@ -1,23 +1,30 @@
 angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) {
 
+    var year0 = 2013; //new Date().getFullYear();
+    var year1 = year0 - 1;
+    var year2 = year1 - 1;
+    var year3 = year2 - 1;
+    var year4 = year3 - 1;
+
   this.showTrees = function(data) {
     var swX = String(data.bbox._southWest.lng),
         swY = String(data.bbox._southWest.lat),
         neX = String(data.bbox._northEast.lng),
         neY = String(data.bbox._northEast.lat),
-        filter = data.filter;
+        filter = data.filter,
+        baseyear = year0;
 
     var sendFilter = [];
 
     for (var a in filter) {
-      if (filter[a] === 'Before 2010') {
-        sendFilter.push.apply(sendFilter, ['2009', '0', '2008']);
+      if (filter[a] === 'Before ' + year3.toString()) {
+        sendFilter.push.apply(sendFilter, ['0', (year3 - 1).toString(), (year3 - 2).toString(), (year3 - 3).toString(), (year3 - 4).toString(), (year3 - 5).toString(), (year3 - 6).toString(), (year3 - 7).toString(), (year3 - 8).toString(), (year3 - 9).toString(), (year3 - 10).toString()]);
       } else {
         sendFilter.push(filter[a]);
       }
     }
 
-    return $http.get('/api/geo/trees?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&filter=' + sendFilter)
+    return $http.get('/api/geo/trees?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&baseyear=' + baseyear.toString() + '&filter=' + sendFilter)
       .then(function(response) {
         return response.data;
       });
@@ -61,19 +68,20 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
         swY = String(data.bbox._southWest.lat),
         neX = String(data.bbox._northEast.lng),
         neY = String(data.bbox._northEast.lat),
-        filter = data.filter;
+        filter = data.filter,
+        baseyear = year0;
 
     var sendFilter = [];
 
     for (var a in filter) {
-      if (filter[a] === 'Before 2010') {
-        sendFilter.push.apply(sendFilter, ['2009', '0', '2008']);
+     if (filter[a] === 'Before ' + year3.toString()) {
+        sendFilter.push.apply(sendFilter, ['0', (year3 - 1).toString(), (year3 - 2).toString(), (year3 - 3).toString(), (year3 - 4).toString(), (year3 - 5).toString(), (year3 - 6).toString(), (year3 - 7).toString(), (year3 - 8).toString(), (year3 - 9).toString(), (year3 - 10).toString()]);
       } else {
         sendFilter.push(filter[a]);
       }
     };
 
-    return $http.get('/api/geo/clusterByReducedPrecision?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&filter=' + sendFilter)
+    return $http.get('/api/geo/clusterByReducedPrecision?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&baseyear=' + baseyear.toString() + '&filter=' + sendFilter)
       .then(function(response){
         return response.data;
       });
