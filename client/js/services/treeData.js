@@ -12,7 +12,12 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
         neX = String(data.bbox._northEast.lng),
         neY = String(data.bbox._northEast.lat),
         filter = data.filter,
+        hood = '',
         baseyear = year0;
+        //var hood = '';
+    if (data.neighborhoodName){
+      hood = '&hood=' + data.neighborhoodName;
+    }
 
     var sendFilter = [];
 
@@ -24,7 +29,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       }
     }
 
-    return $http.get('/api/geo/trees?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&baseyear=' + baseyear.toString() + '&filter=' + sendFilter)
+    return $http.get('/api/geo/trees?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&baseyear=' + baseyear.toString() + hood + '&filter=' + sendFilter)
       .then(function(response) {
         return response.data;
       });
@@ -82,7 +87,12 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
         neX = String(data.bbox._northEast.lng),
         neY = String(data.bbox._northEast.lat),
         filter = data.filter,
+        hood = '',
         baseyear = year0;
+
+    if (data.neighborhoodName){
+      hood = '&hood=' + data.neighborhoodName;
+    }
 
     var sendFilter = [];
 
@@ -94,7 +104,7 @@ angular.module('treeData', ['ngRoute']).factory('treeData', function($http, $q) 
       }
     };
 
-    return $http.get('/api/geo/clusterByReducedPrecision?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&baseyear=' + baseyear.toString() + '&filter=' + sendFilter)
+    return $http.get('/api/geo/clusterByReducedPrecision?neLat=' + neY + '&neLng=' + neX + '&swLat=' + swY + '&swLng=' + swX + '&baseyear=' + baseyear.toString() + hood + '&filter=' + sendFilter)
       .then(function(response){
         return response.data;
       });

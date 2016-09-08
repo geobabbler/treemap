@@ -50,7 +50,9 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', '$
     }
     else {
       $scope.singleHood.clearLayers();
+      $scope.neighborhoodNameSelected = null;
       $scope.hideSingleNeighborhood = true;
+      $scope.drawTrees();
     }
 
   }

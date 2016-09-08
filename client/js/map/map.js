@@ -294,13 +294,16 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
 
     //function to draw the trees
     $scope.drawTrees = function() {
-
+      /*if($scope.neighborhoodNameSelected){
+      alert("n: " + $scope.neighborhoodNameSelected);
+      }*/
       //zoomed in pretty far
       if ($scope.map.getZoom() >= 15) {
         treeData.showTrees({
           bbox: $scope.map.getBounds(),
           filter: $scope.disabledYearArray,
-          baseyear: year0
+          baseyear: year0,
+          neighborhoodName: $scope.neighborhoodNameSelected
         }).then(function(data) {
           var total = 0;
           data.features.forEach(function(d) {
@@ -363,7 +366,9 @@ mapStuff.controller('mapController', ['$scope', '$rootScope', 'treeData',
         // }
         treeData.clusterByReducedPrecision({
           bbox: $scope.map.getBounds(),
-          filter: $scope.disabledYearArray
+          filter: $scope.disabledYearArray,
+          baseyear: year0,
+          neighborhoodName: $scope.neighborhoodNameSelected
         }).then(function(data) {
           console.log(data)
           $scope.treeLayer.clearLayers();

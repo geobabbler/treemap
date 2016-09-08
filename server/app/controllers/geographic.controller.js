@@ -56,6 +56,7 @@ exports.showTrees = function(req, res, next) {
     swX = req.query.swLat,
     swY = req.query.swLng,
     filter = req.query.filter,
+    hood = req.query.hood,
     baseyear = req.query.baseyear;
 
 if(baseyear){
@@ -84,6 +85,10 @@ console.log("here");
       if (filter) {
         myQuery += ` and year::int != all (array[${filter}])`
       }
+      if (hood) {
+        myQuery += ` and neighborhoodname = '${hood}'`
+      }
+
       myQuery += ` GROUP BY common_nam, genus, species, year, geom, planted_by, neighborhoodname;`
 console.log(myQuery);
       client.query(myQuery, function(err, result) {
@@ -127,6 +132,7 @@ exports.clusterByReducedPrecision = function(req, res, next) {
     swX = req.query.swLat,
     swY = req.query.swLng,
     filter = req.query.filter,
+    hood = req.query.hood,
     baseyear = parseInt(req.query.baseyear);
   //if the bounding box has three values come in on param...
   pg.connect(cfg, function(err, client, done) {
@@ -157,11 +163,16 @@ exports.clusterByReducedPrecision = function(req, res, next) {
             FROM tree_plantingswgs84
             WHERE ST_Intersects(geom, ST_GeometryFromText ('POLYGON((${swY} ${swX},${neY} ${swX},${neY} ${neX},${swY} ${neX},${swY} ${swX}))', 4326 ))
           `;
-console.log(myQuery);
           if (filter) {
             myQuery += ` and year::int != all (array[${filter}])`
           }
+          if (hood) {
+            myQuery += ` and neighborhoodname = '${hood}'`
+          }
+
           myQuery += ` GROUP BY neighborhoodname`;
+          console.log(myQuery);
+
           // console.log(myQuery);
     client.query(myQuery, function(err, result) {
       var totalTrees = 0;
