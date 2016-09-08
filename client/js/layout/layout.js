@@ -72,7 +72,7 @@ appLayout.controller('layoutController', ['$scope', '$rootScope', 'treeData', '$
     $scope.filterOn = false;
   }
   $scope.pinned = false;
-  $scope.openFilterMenu = false;
+  $scope.openFilterMenu = true;
   $scope.toggleShowFilter = function(type){
     //if the menu is not pinned and the filtertoggle is not pin(aka hover)
     if((type !== 'pin') && ($scope.pinned === false)){

@@ -161,3 +161,7 @@ div.container-fluid {
 .leaflet-marker-pane {
   display: none;
 }
+
+.leaflet-control-attribution {
+  background: blue;
+}
